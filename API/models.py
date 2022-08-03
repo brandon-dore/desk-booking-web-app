@@ -19,7 +19,7 @@ class User(Base):
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     username = Column(String, unique=True, nullable=False)
     hashed_password = Column(String(128))
-    assigned_team = Column(UUID(as_uuid=True), ForeignKey(
+    team_id = Column(UUID(as_uuid=True), ForeignKey(
         'team.id'), unique=False, nullable=True)
 
     
@@ -34,7 +34,7 @@ class Desk(Base):
     __tablename__ = "desks"
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    desk_number = Column(Integer, unique=True, nullable=False)
+    number = Column(Integer, unique=True, nullable=False)
     assigned_team = Column(UUID(as_uuid=True), ForeignKey(
         'team.id'), unique=False, nullable=True)
 
@@ -46,6 +46,6 @@ class Booking(Base):
     approved_status = Column(Boolean, unique=False, nullable=False)
     start_date = Column(Date, unique=False, nullable=False)
     end_date = Column(Date, unique=False, nullable=False)
-    assigned_desk = Column(UUID(as_uuid=True), ForeignKey(
+    desk_id = Column(UUID(as_uuid=True), ForeignKey(
         'desk.id'), unique=False, nullable=False)
     users = relationship('User', secondary=users_events, backref='events')
