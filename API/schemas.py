@@ -75,6 +75,7 @@ class BookingCreate(BookingBase):
 
 class Booking(BookingBase):
     desk: Desk
+    user: User
 
     class Config:
         orm_mode = True

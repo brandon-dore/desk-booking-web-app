@@ -55,6 +55,7 @@ class TestClass:
         "room_name": "Test Room"
     }
 
+
 class TestGroup(TestClass):
 
     @pytest.fixture(autouse=True)
@@ -191,18 +192,18 @@ class TestGroup(TestClass):
         data = response.json()
         assert data["approved_status"] == False
         assert data["date"] == str(datetime.date(2020, 5, 17))
-        # assert data["desk_number"] == 4
-        # assert data["user_email"] == "test@test.com"
-        # assert data["room_name"] == "Test Room"
+        assert data["desk"]["number"] == 4
+        assert data["user"]["email"] == "test@test.com"
+        assert data["desk"]["room"] == "Test Room"
 
         date = data["date"]
-        # user_email = data["email"]
+        user_email = data["user"]["email"]
 
-        response = client.get(f"/bookings/{date}/test@test.com")
+        response = client.get(f"/bookings/{date}/{user_email}")
         assert response.status_code == 200, response.text
         data = response.json()
         assert data["approved_status"] == False
         assert data["date"] == str(datetime.date(2020, 5, 17))
-        # assert data["desk_number"] == 4
-        # assert data["user_email"] == "test@test.com"
-        # assert data["room_name"] == "Test Room"
+        assert data["desk"]["number"] == 4
+        assert data["user"]["email"] == "test@test.com"
+        assert data["desk"]["room"] == "Test Room"

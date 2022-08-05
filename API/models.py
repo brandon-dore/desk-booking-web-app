@@ -69,3 +69,5 @@ class Booking(Base):
     approved_status = Column(Boolean, unique=False, nullable=False)
 
     desk = relationship("Desk")
+    user = relationship("User")
+
