@@ -5,9 +5,8 @@ from sqlalchemy import and_
 from sqlalchemy.orm.exc import NoResultFound
 
 import datetime
-import models
-import schemas
 
+from . import models, schemas
 
 
 def get_user(db: Session, email: str):
