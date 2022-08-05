@@ -64,7 +64,7 @@ class TestGroup(TestClass):
         yield
         Base.metadata.drop_all(bind=engine)
 
-    def test_create_user(self):
+    def test_create_and_get_user(self):
         response = client.post(
             "/users/",
             json=self.user_request,
@@ -79,7 +79,7 @@ class TestGroup(TestClass):
         data = response.json()
         assert data["email"] == "test@test.com"
 
-    def test_create_team(self):
+    def test_create_and_get_team(self):
         response = client.post(
             "/teams/",
             json=self.team_request,
@@ -94,7 +94,7 @@ class TestGroup(TestClass):
         data = response.json()
         assert data["name"] == "Test Team"
 
-    def test_create_room(self):
+    def test_create_and_get_room(self):
         response = client.post(
             "/rooms/",
             json=self.room_request,
@@ -109,7 +109,7 @@ class TestGroup(TestClass):
         data = response.json()
         assert data["name"] == "Test Room"
 
-    def test_create_desk_with_no_team(self):
+    def test_create_and_get_desk_with_no_team(self):
         client.post(
             "/rooms/",
             json=self.room_request,
@@ -132,7 +132,7 @@ class TestGroup(TestClass):
         assert data["number"] == 4
         assert data["room"] == "Test Room"
 
-    def test_create_desk_with_team(self):
+    def test_create_and_get_desk_with_team(self):
         client.post(
             "/rooms/",
             json=self.room_request,
@@ -163,7 +163,7 @@ class TestGroup(TestClass):
         assert data["room"] == "Test Room"
         assert data["assigned_team"] == "Test Team"
 
-    def test_create_booking(self):
+    def test_create_and_get_booking(self):
         client.post(
             "/users/",
             json=self.user_request,
