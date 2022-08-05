@@ -1,4 +1,5 @@
-from typing import Union, List
+from typing import Dict, Union, List, Tuple
+
 from uuid import UUID
 import datetime
 from pydantic import BaseModel
@@ -14,7 +15,7 @@ class UserCreate(UserBase):
 
 
 class User(UserBase):
-    id: int
+    pass
 
     class Config:
         orm_mode = True
@@ -27,18 +28,30 @@ class TeamBase(BaseModel):
 class TeamCreate(TeamBase):
     pass
 
-
 class Team(TeamBase):
-    id: int
+    pass
 
     class Config:
         orm_mode = True
 
+class RoomBase(BaseModel):
+    name: str
+
+
+class RoomCreate(TeamBase):
+    pass
+
+
+class Room(TeamBase):
+    pass
+
+    class Config:
+        orm_mode = True
 
 class DeskBase(BaseModel):
-    desk_number: int
-    room_name: str
-    assigned_team: int
+    number: int
+    room: str
+    assigned_team: str
 
 
 class DeskCreate(DeskBase):
@@ -46,40 +59,53 @@ class DeskCreate(DeskBase):
 
 
 class Desk(DeskBase):
-    id: int
+    pass
 
     class Config:
         orm_mode = True
 
 
 class BookingBase(BaseModel):
-    approved_status: str
-    start_date: datetime.date
-    end_date: datetime.date
-
+    approved_status: bool
+    date: datetime.date
 
 class BookingCreate(BookingBase):
-    pass
-
+    desk_number: int
+    user_email: str
+    room_name: str
 
 class Booking(BookingBase):
-    id: int
+    desk: Desk
+
+    class Config:
+        orm_mode = True
+        
+class Overview(BaseModel):
+    booking: Booking
+    desk: Desk
+
 
     class Config:
         orm_mode = True
 
 
-class UserSchema(UserBase):
+class UserOut(UserBase):
     authors: List[TeamBase]
 
 
-class UTeamSchema(TeamBase):
+class TeamOutUsers(TeamBase):
     books: List[UserBase]
 
 
-class DTeamSchema(TeamBase):
+class TeamOutDesks(TeamBase):
     authors: List[DeskBase]
 
 
-class DeskSchema(DeskBase):
+class DeskOut(DeskBase):
     books: List[DeskBase]
+    
+class JoinResult(BaseModel):
+    results: List[Tuple[Booking, Desk]]
+
+    class Config:
+        orm_mode = True
