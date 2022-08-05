@@ -6,7 +6,7 @@ from sqlalchemy.orm.exc import NoResultFound
 
 import datetime
 
-from . import models, schemas
+from api import models, schemas
 
 
 def get_user(db: Session, email: str):
@@ -94,7 +94,6 @@ def get_booking(db: Session, date: datetime.date, user_email: str):
     return db.query(models.Booking).filter(and_(models.Booking.date == date, models.Booking.user_id == user_info.id)).first()
 
 
-
 def get_booking_by_desk_and_date(db: Session, desk_number: int, date: datetime.date, room_name: str):
     try:
         desk_info = db.query(models.Desk).filter(
@@ -106,6 +105,7 @@ def get_booking_by_desk_and_date(db: Session, desk_number: int, date: datetime.d
 
 def get_bookings(db: Session, skip: int = 0, limit: int = 100):
     return db.query(models.Booking).offset(skip).limit(limit).all()
+
 
 def create_booking(db: Session, booking: schemas.BookingCreate):
     try:

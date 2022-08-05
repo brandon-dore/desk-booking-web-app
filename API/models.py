@@ -3,7 +3,7 @@ import uuid
 from sqlalchemy import Boolean, Column, Date, ForeignKey, Integer, String, Table, UniqueConstraint
 from sqlalchemy.orm import relationship
 
-from .database import Base
+from api.database import Base
 
 
 class User(Base):
@@ -15,8 +15,8 @@ class User(Base):
     name = Column(String, unique=False, nullable=False)
     hashed_password = Column(String(128))
 
-    assigned_team = Column(Integer, ForeignKey(
-        'teams.id'), unique=False, nullable=True)
+    assigned_team = Column(String, ForeignKey(
+        'teams.name'), unique=False, nullable=True)
 
 
 class Team(Base):
@@ -67,7 +67,5 @@ class Booking(Base):
 
     date = Column(Date, unique=False, nullable=False)
     approved_status = Column(Boolean, unique=False, nullable=False)
-    
+
     desk = relationship("Desk")
-
-

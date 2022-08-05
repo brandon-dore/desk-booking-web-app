@@ -1,6 +1,5 @@
-from typing import Dict, Union, List, Tuple
+from typing import List, Tuple
 
-from uuid import UUID
 import datetime
 from pydantic import BaseModel
 
@@ -8,7 +7,7 @@ from pydantic import BaseModel
 class UserBase(BaseModel):
     name: str
     email: str
-
+    assigned_team: str = None
 
 class UserCreate(UserBase):
     password: str
@@ -51,7 +50,7 @@ class Room(TeamBase):
 class DeskBase(BaseModel):
     number: int
     room: str
-    assigned_team: str
+    assigned_team: str = None
 
 
 class DeskCreate(DeskBase):

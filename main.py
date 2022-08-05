@@ -1,11 +1,10 @@
 from fastapi import Depends, FastAPI, HTTPException
 from sqlalchemy.orm import Session
-from typing import List, Tuple, Union
 
 import datetime
-from . import crud, models, schemas
+from api import crud, models, schemas
 
-from .database import SessionLocal, engine
+from api.database import SessionLocal, engine
 
 models.Base.metadata.create_all(bind=engine)
 
@@ -22,6 +21,7 @@ def get_db():
         db.close()
 
 # Users
+
 
 @app.post("/users/", response_model=schemas.User)
 def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
@@ -46,6 +46,7 @@ def read_user(user_email: str, db: Session = Depends(get_db)):
 
 # Teams
 
+
 @app.post("/teams/", response_model=schemas.Team)
 def create_team(team: schemas.TeamCreate, db: Session = Depends(get_db)):
     db_team = crud.get_team_by_name(db, team_name=team.name)
@@ -69,6 +70,7 @@ def read_team(team_name: str, db: Session = Depends(get_db)):
 
 # Rooms
 
+
 @app.post("/rooms/", response_model=schemas.Room)
 def create_room(room: schemas.RoomCreate, db: Session = Depends(get_db)):
     db_room = crud.get_room_by_name(db, room_name=room.name)
@@ -91,6 +93,7 @@ def read_room(room_name: str, db: Session = Depends(get_db)):
     return db_room
 
 # Desks
+
 
 @app.post("/desks/", response_model=schemas.Desk)
 def create_desk(desk: schemas.DeskCreate, db: Session = Depends(get_db)):
@@ -117,6 +120,7 @@ def read_desk(room_name: str, desk_number: int, db: Session = Depends(get_db)):
 
 # Bookings
 
+
 @app.post("/bookings/", response_model=schemas.Booking)
 def create_booking(booking: schemas.BookingCreate, db: Session = Depends(get_db)):
     db_booking = crud.get_booking_by_desk_and_date(
@@ -131,7 +135,6 @@ def read_bookings(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)
     bookings = crud.get_bookings(db=db, skip=skip, limit=limit)
     print(bookings[0].desk)
     return bookings
-
 
 
 @app.get("/bookings/{date}/{user_email}", response_model=schemas.Booking)
