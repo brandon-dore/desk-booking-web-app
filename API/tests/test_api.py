@@ -30,7 +30,7 @@ app.dependency_overrides[get_db] = override_get_db
 client = TestClient(app)
 
 
-class TestClass:
+class TestData:
     user_request = {
         "name": "John Smith",
         "email": "test@test.com",
@@ -56,7 +56,7 @@ class TestClass:
     }
 
 
-class TestGroup(TestClass):
+class CreateAndGetTests(TestClass):
 
     @pytest.fixture(autouse=True)
     def test_db(self):
