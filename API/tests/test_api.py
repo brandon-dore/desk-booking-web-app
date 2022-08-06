@@ -56,7 +56,7 @@ class TestData:
     }
 
 
-class CreateAndGetTests(TestClass):
+class TestCreateAndGet(TestData):
 
     @pytest.fixture(autouse=True)
     def test_db(self):
