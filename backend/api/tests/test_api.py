@@ -6,7 +6,7 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
 import sqlalchemy
 from api.database import Base
-from main import app, get_db
+from api.api import app, get_db
 
 SQLALCHEMY_DATABASE_URL = "postgresql://postgres:password@localhost:5432/desk_booking_db_testing"
 
