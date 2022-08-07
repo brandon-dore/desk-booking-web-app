@@ -70,4 +70,3 @@ class Booking(Base):
 
     desk = relationship("Desk")
     user = relationship("User")
-

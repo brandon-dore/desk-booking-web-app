@@ -1,5 +1,5 @@
 from fastapi import HTTPException
-from sqlalchemy.orm import Session, joinedload
+from sqlalchemy.orm import Session
 from sqlalchemy import and_
 from sqlalchemy.orm.exc import NoResultFound
 
@@ -7,8 +7,8 @@ import datetime
 
 from api import models, schemas, auth
 
-from datetime import datetime, timedelta
-from typing import Union
+from datetime import datetime
+
 
 def get_user(db: Session, username: str):
     return db.query(models.User).filter(models.User.username == username).first()
@@ -21,11 +21,12 @@ def get_users(db: Session, skip: int = 0, limit: int = 100):
 def create_user(db: Session, user: schemas.UserCreate):
     # Do hashing here
     db_user = models.User(
-        email=user.email, username=user.username, hashed_password=auth.get_password_hash(user.password))
+        email=user.email, username=user.username, hashed_password=auth.get_hashed_password(user.password))
     db.add(db_user)
     db.commit()
     db.refresh(db_user)
     return db_user
+
 
 def get_team(db: Session, team_id: int):
     return db.query(models.Team).filter(models.Team.id == team_id).first()
