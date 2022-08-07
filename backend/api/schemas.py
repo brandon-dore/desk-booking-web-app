@@ -1,11 +1,11 @@
-from typing import List, Tuple
+from typing import List, Tuple, Union
 
 import datetime
 from pydantic import BaseModel
 
 
 class UserBase(BaseModel):
-    name: str
+    username: str
     email: str
     assigned_team: str = None
 
@@ -88,7 +88,13 @@ class Overview(BaseModel):
     class Config:
         orm_mode = True
 
+class Token(BaseModel):
+    access_token: str
+    token_type: str
 
+
+class TokenData(BaseModel):
+    username: Union[str, None] = None
 class UserOut(UserBase):
     authors: List[TeamBase]
 
