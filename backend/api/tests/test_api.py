@@ -30,11 +30,22 @@ app.dependency_overrides[get_db] = override_get_db
 client = TestClient(app)
 
 
-class TestData:
+class TestSetup:
+    @pytest.fixture(autouse=True)
+    def test_db(self):
+        Base.metadata.create_all(bind=engine)
+        yield
+        Base.metadata.drop_all(bind=engine)
+        
     user_request = {
-        "name": "John Smith",
+        "username": "user5482",
         "email": "test@test.com",
         "password": "testpass"
+    }
+    user_request_invalid = {
+        "username": "user5482",
+        "email": "test@test.com",
+        "password": "testpass56"
     }
     team_request = {"name": "Test Team"}
     room_request = {"name": "Test Room"}
@@ -51,30 +62,26 @@ class TestData:
         "approved_status": False,
         "date": str(datetime.date(2020, 5, 17)),
         "desk_number": 4,
-        "user_email": "test@test.com",
+        "username": "user5482",
         "room_name": "Test Room"
     }
+    headers = {'Content-Type': 'application/x-www-form-urlencoded'}
+    
 
 
-class TestCreateAndGet(TestData):
-
-    @pytest.fixture(autouse=True)
-    def test_db(self):
-        Base.metadata.create_all(bind=engine)
-        yield
-        Base.metadata.drop_all(bind=engine)
+class TestCreateAndGet(TestSetup):
 
     def test_create_and_get_user(self):
         response = client.post(
-            "/users/",
+            "/register/",
             json=self.user_request,
         )
         assert response.status_code == 200, response.text
         data = response.json()
         assert data["email"] == "test@test.com"
-        user_email = data["email"]
+        username = data["username"]
 
-        response = client.get(f"/users/{user_email}")
+        response = client.get(f"/users/{username}")
         assert response.status_code == 200, response.text
         data = response.json()
         assert data["email"] == "test@test.com"
@@ -165,7 +172,7 @@ class TestCreateAndGet(TestData):
 
     def test_create_and_get_booking(self):
         client.post(
-            "/users/",
+            "/register/",
             json=self.user_request,
         )
 
@@ -197,9 +204,9 @@ class TestCreateAndGet(TestData):
         assert data["desk"]["room"] == "Test Room"
 
         date = data["date"]
-        user_email = data["user"]["email"]
+        username = data["user"]["username"]
 
-        response = client.get(f"/bookings/{date}/{user_email}")
+        response = client.get(f"/bookings/{date}/{username}")
         assert response.status_code == 200, response.text
         data = response.json()
         assert data["approved_status"] == False
@@ -207,3 +214,33 @@ class TestCreateAndGet(TestData):
         assert data["desk"]["number"] == 4
         assert data["user"]["email"] == "test@test.com"
         assert data["desk"]["room"] == "Test Room"
+
+class TestUserAuth(TestSetup):
+    def test_register_and_login(self):
+        client.post(
+            "/register/",
+            json=self.user_request,
+        )
+
+        response = client.post(
+            "/login/",
+            data=self.user_request, 
+            headers=self.headers
+        )
+        
+        assert response.status_code == 200, response.text
+        
+    def test_register_and_fail_login(self):
+        client.post(
+            "/register/",
+            json=self.user_request,
+        )
+
+        response = client.post(
+            "/login/",
+            data=self.user_request_invalid, 
+            headers=self.headers
+        )
+        
+        assert response.status_code == 401, response.text
+

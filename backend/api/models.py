@@ -12,7 +12,7 @@ class User(Base):
     # Possibly want to do UUID/GUID for users :)
     id = Column(Integer, primary_key=True, index=True)
     email = Column(String, unique=True, index=True)
-    name = Column(String, unique=False, nullable=False)
+    username = Column(String, unique=True, nullable=False)
     hashed_password = Column(String(128))
 
     assigned_team = Column(String, ForeignKey(
@@ -70,4 +70,3 @@ class Booking(Base):
 
     desk = relationship("Desk")
     user = relationship("User")
-

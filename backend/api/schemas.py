@@ -1,13 +1,14 @@
-from typing import List, Tuple
+from typing import List, Tuple, Union
 
 import datetime
 from pydantic import BaseModel
 
 
 class UserBase(BaseModel):
-    name: str
+    username: str
     email: str
     assigned_team: str = None
+
 
 class UserCreate(UserBase):
     password: str
@@ -27,11 +28,13 @@ class TeamBase(BaseModel):
 class TeamCreate(TeamBase):
     pass
 
+
 class Team(TeamBase):
     pass
 
     class Config:
         orm_mode = True
+
 
 class RoomBase(BaseModel):
     name: str
@@ -46,6 +49,7 @@ class Room(TeamBase):
 
     class Config:
         orm_mode = True
+
 
 class DeskBase(BaseModel):
     number: int
@@ -68,10 +72,12 @@ class BookingBase(BaseModel):
     approved_status: bool
     date: datetime.date
 
+
 class BookingCreate(BookingBase):
     desk_number: int
-    user_email: str
+    username: str
     room_name: str
+
 
 class Booking(BookingBase):
     desk: Desk
@@ -79,14 +85,24 @@ class Booking(BookingBase):
 
     class Config:
         orm_mode = True
-        
+
+
 class Overview(BaseModel):
     booking: Booking
     desk: Desk
 
-
     class Config:
         orm_mode = True
+
+
+class Token(BaseModel):
+    access_token: str
+    refresh_token: str
+    token_type: str
+
+
+class TokenData(BaseModel):
+    username: Union[str, None] = None
 
 
 class UserOut(UserBase):
@@ -103,7 +119,8 @@ class TeamOutDesks(TeamBase):
 
 class DeskOut(DeskBase):
     books: List[DeskBase]
-    
+
+
 class JoinResult(BaseModel):
     results: List[Tuple[Booking, Desk]]
 

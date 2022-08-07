@@ -1,16 +1,17 @@
-from pyexpat import model
 from fastapi import HTTPException
-from sqlalchemy.orm import Session, joinedload
+from sqlalchemy.orm import Session
 from sqlalchemy import and_
 from sqlalchemy.orm.exc import NoResultFound
 
 import datetime
 
-from api import models, schemas
+from api import models, schemas, auth
+
+from datetime import datetime
 
 
-def get_user(db: Session, email: str):
-    return db.query(models.User).filter(models.User.email == email).first()
+def get_user(db: Session, username: str):
+    return db.query(models.User).filter(models.User.username == username).first()
 
 
 def get_users(db: Session, skip: int = 0, limit: int = 100):
@@ -19,9 +20,8 @@ def get_users(db: Session, skip: int = 0, limit: int = 100):
 
 def create_user(db: Session, user: schemas.UserCreate):
     # Do hashing here
-    fake_hashed_password = user.password + "dohashinghere"
     db_user = models.User(
-        email=user.email, name=user.name, hashed_password=fake_hashed_password)
+        email=user.email, username=user.username, hashed_password=auth.get_hashed_password(user.password))
     db.add(db_user)
     db.commit()
     db.refresh(db_user)
@@ -89,8 +89,8 @@ def create_desk(db: Session, desk: schemas.DeskCreate):
     return db_desk
 
 
-def get_booking(db: Session, date: datetime.date, user_email: str):
-    user_info = get_user(db, email=user_email)
+def get_booking(db: Session, date: datetime.date, username: str):
+    user_info = get_user(db, username=username)
     return db.query(models.Booking).filter(and_(models.Booking.date == date, models.Booking.user_id == user_info.id)).first()
 
 
@@ -110,7 +110,7 @@ def get_bookings(db: Session, skip: int = 0, limit: int = 100):
 def create_booking(db: Session, booking: schemas.BookingCreate):
     try:
         user_info = db.query(models.User).filter(
-            models.User.email == booking.user_email).one()
+            models.User.username == booking.username).one()
         desk_info = db.query(models.Desk).filter(and_(
             models.Desk.number == booking.desk_number, models.Desk.room == booking.room_name)).one()
     except NoResultFound:
