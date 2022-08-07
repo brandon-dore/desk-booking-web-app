@@ -75,7 +75,7 @@ class BookingBase(BaseModel):
 
 class BookingCreate(BookingBase):
     desk_number: int
-    user_email: str
+    username: str
     room_name: str
 
 

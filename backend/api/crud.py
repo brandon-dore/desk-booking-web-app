@@ -89,8 +89,8 @@ def create_desk(db: Session, desk: schemas.DeskCreate):
     return db_desk
 
 
-def get_booking(db: Session, date: datetime.date, user_email: str):
-    user_info = get_user(db, email=user_email)
+def get_booking(db: Session, date: datetime.date, username: str):
+    user_info = get_user(db, username=username)
     return db.query(models.Booking).filter(and_(models.Booking.date == date, models.Booking.user_id == user_info.id)).first()
 
 
@@ -110,7 +110,7 @@ def get_bookings(db: Session, skip: int = 0, limit: int = 100):
 def create_booking(db: Session, booking: schemas.BookingCreate):
     try:
         user_info = db.query(models.User).filter(
-            models.User.email == booking.user_email).one()
+            models.User.username == booking.username).one()
         desk_info = db.query(models.Desk).filter(and_(
             models.Desk.number == booking.desk_number, models.Desk.room == booking.room_name)).one()
     except NoResultFound:

@@ -171,10 +171,10 @@ def read_bookings(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)
     return bookings
 
 
-@app.get("/bookings/{date}/{user_email}", response_model=schemas.Booking)
-def read_booking(date: date, user_email: str, db: Session = Depends(get_db)):
+@app.get("/bookings/{date}/{username}", response_model=schemas.Booking)
+def read_booking(date: date, username: str, db: Session = Depends(get_db)):
     db_booking = crud.get_booking(
-        db, date=date, user_email=user_email)
+        db, date=date, username=username)
     if db_booking is None:
         raise HTTPException(status_code=404, detail="Booking not found")
     return db_booking
