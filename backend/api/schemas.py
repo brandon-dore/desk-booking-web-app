@@ -5,6 +5,7 @@ from pydantic import BaseModel
 
 
 class UserBase(BaseModel):
+    id: int
     username: str
     email: str
     assigned_team: str = None
@@ -22,6 +23,7 @@ class User(UserBase):
 
 
 class TeamBase(BaseModel):
+    id: int
     name: str
 
 
@@ -37,6 +39,7 @@ class Team(TeamBase):
 
 
 class RoomBase(BaseModel):
+    id: int
     name: str
 
 
@@ -52,6 +55,7 @@ class Room(TeamBase):
 
 
 class DeskBase(BaseModel):
+    id: int
     number: int
     room: str
     assigned_team: str = None
@@ -69,6 +73,7 @@ class Desk(DeskBase):
 
 
 class BookingBase(BaseModel):
+    id: int
     approved_status: bool
     date: datetime.date
 

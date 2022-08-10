@@ -1,16 +1,31 @@
-from fastapi import Depends, FastAPI, HTTPException, status
+from fastapi import Depends, FastAPI, HTTPException, status, Response
 from fastapi.responses import RedirectResponse
 from sqlalchemy.orm import Session
 from datetime import timedelta, date
 
 from api import crud, models, schemas, auth
 from fastapi.security import OAuth2PasswordRequestForm
+from fastapi.middleware.cors import CORSMiddleware
 
 from api.database import SessionLocal, engine
 
 models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="Desk Booking API")
+
+origins = [
+    "http://localhost",
+    "http://localhost:8080",
+    "http://localhost:3000",
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # Check if Database is a month (or week) old an delete if so?
 
@@ -52,7 +67,7 @@ def login_and_get_token(form_data: OAuth2PasswordRequestForm = Depends(), db: Se
     }
 
 
-@app.post("/register/", response_model=schemas.User)
+@app.post("/register", response_model=schemas.User)
 def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
     db_user = crud.get_user(db, username=user.username)
     if db_user:
@@ -65,9 +80,11 @@ async def get_me(user: schemas.User = Depends(auth.get_current_user)):
     return user
 
 
-@app.get("/users/", response_model=list[schemas.User])
-def read_users(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+@app.get("/users", response_model=list[schemas.User])
+def read_users(response: Response, skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     users = crud.get_users(db, skip=skip, limit=limit)
+    response.headers["X-Total-Count"] = str(len(users))
+    response.headers['Access-Control-Expose-Headers'] = 'X-Total-Count'
     return users
 
 
@@ -81,7 +98,7 @@ def read_user(username: str, db: Session = Depends(get_db)):
 # Teams
 
 
-@app.post("/teams/", response_model=schemas.Team)
+@app.post("/teams", response_model=schemas.Team)
 def create_team(team: schemas.TeamCreate, db: Session = Depends(get_db)):
     db_team = crud.get_team_by_name(db, team_name=team.name)
     if db_team:
@@ -89,9 +106,11 @@ def create_team(team: schemas.TeamCreate, db: Session = Depends(get_db)):
     return crud.create_team(db=db, team=team)
 
 
-@app.get("/teams/", response_model=list[schemas.Team])
-def read_teams(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+@app.get("/teams", response_model=list[schemas.Team])
+def read_teams(response: Response, skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     teams = crud.get_teams(db, skip=skip, limit=limit)
+    response.headers["X-Total-Count"] = str(len(teams))
+    response.headers['Access-Control-Expose-Headers'] = 'X-Total-Count'
     return teams
 
 
@@ -105,7 +124,7 @@ def read_team(team_name: str, db: Session = Depends(get_db)):
 # Rooms
 
 
-@app.post("/rooms/", response_model=schemas.Room)
+@app.post("/rooms", response_model=schemas.Room)
 def create_room(room: schemas.RoomCreate, db: Session = Depends(get_db)):
     db_room = crud.get_room_by_name(db, room_name=room.name)
     if db_room:
@@ -113,9 +132,11 @@ def create_room(room: schemas.RoomCreate, db: Session = Depends(get_db)):
     return crud.create_room(db=db, room=room)
 
 
-@app.get("/rooms/", response_model=list[schemas.Room])
-def read_rooms(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+@app.get("/rooms", response_model=list[schemas.Room])
+def read_rooms(response: Response, skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     rooms = crud.get_rooms(db, skip=skip, limit=limit)
+    response.headers["X-Total-Count"] = str(len(rooms))
+    response.headers['Access-Control-Expose-Headers'] = 'X-Total-Count'
     return rooms
 
 
@@ -129,7 +150,7 @@ def read_room(room_name: str, db: Session = Depends(get_db)):
 # Desks
 
 
-@app.post("/desks/", response_model=schemas.Desk)
+@app.post("/desks", response_model=schemas.Desk)
 def create_desk(desk: schemas.DeskCreate, db: Session = Depends(get_db)):
     db_user = crud.get_desk_by_room_and_number(
         db, room_name=desk.room, desk_number=desk.number)
@@ -138,10 +159,12 @@ def create_desk(desk: schemas.DeskCreate, db: Session = Depends(get_db)):
     return crud.create_desk(db=db, desk=desk)
 
 
-@app.get("/desks/", response_model=list[schemas.Desk])
-def read_desks(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
-    users = crud.get_desks(db, skip=skip, limit=limit)
-    return users
+@app.get("/desks", response_model=list[schemas.Desk])
+def read_desks(response: Response, skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+    desks = crud.get_desks(db, skip=skip, limit=limit)
+    response.headers["X-Total-Count"] = str(len(desks))
+    response.headers['Access-Control-Expose-Headers'] = 'X-Total-Count'
+    return desks
 
 
 @app.get("/desks/{room_name}/{desk_number}", response_model=schemas.Desk)
@@ -155,7 +178,7 @@ def read_desk(room_name: str, desk_number: int, db: Session = Depends(get_db)):
 # Bookings
 
 
-@app.post("/bookings/", response_model=schemas.Booking)
+@app.post("/bookings", response_model=schemas.Booking)
 def create_booking(booking: schemas.BookingCreate, db: Session = Depends(get_db)):
     db_booking = crud.get_booking_by_desk_and_date(
         db, desk_number=booking.desk_number, room_name=booking.room_name, date=booking.date)
@@ -164,10 +187,11 @@ def create_booking(booking: schemas.BookingCreate, db: Session = Depends(get_db)
     return crud.create_booking(db=db, booking=booking)
 
 
-@app.get("/bookings/", response_model=list[schemas.Booking])
-def read_bookings(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+@app.get("/bookings", response_model=list[schemas.Booking])
+def read_bookings(response: Response, skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     bookings = crud.get_bookings(db=db, skip=skip, limit=limit)
-    print(bookings[0].desk)
+    response.headers["X-Total-Count"] = str(len(bookings))
+    response.headers['Access-Control-Expose-Headers'] = 'X-Total-Count'
     return bookings
 
 
