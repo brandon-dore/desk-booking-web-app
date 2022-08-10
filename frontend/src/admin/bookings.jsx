@@ -7,8 +7,8 @@ export const BookingList = () => (
             <TextField source="id" />
             <BooleanField source="approved_status" />
             <DateField source="date" />
-            <NumberField source="desk.id" />
-            <NumberField source="user.id" />
+            <NumberField source="desk_id" />
+            <NumberField source="user_id" />
         </Datagrid>
     </List>
 );

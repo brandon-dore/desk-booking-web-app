@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Datagrid, EmailField, List, TextField } from 'react-admin';
+import { Datagrid, EmailField, List, TextField, BooleanField } from 'react-admin';
 
 export const UserList = () => (
     <List>
@@ -8,6 +8,7 @@ export const UserList = () => (
             <TextField source="username" />
             <EmailField source="email" />
             <TextField source="assigned_team" />
+            <BooleanField source="admin" />
         </Datagrid>
     </List>
 );
