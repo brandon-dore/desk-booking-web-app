@@ -14,6 +14,7 @@ class User(Base):
     email = Column(String, unique=True, index=True)
     username = Column(String, unique=True, nullable=False)
     hashed_password = Column(String(128))
+    admin = Column(Boolean, unique=False, nullable=False)
 
     assigned_team = Column(String, ForeignKey(
         'teams.name'), unique=False, nullable=True)

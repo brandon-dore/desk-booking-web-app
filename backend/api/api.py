@@ -47,7 +47,7 @@ def docs():
 # Users
 
 
-@app.post("/login/", response_model=schemas.Token)
+@app.post("/login", response_model=schemas.Token)
 def login_and_get_token(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
     user = auth.authenticate_user(db, form_data.username, form_data.password)
     if not user:

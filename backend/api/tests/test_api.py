@@ -73,7 +73,7 @@ class TestCreateAndGet(TestSetup):
 
     def test_create_and_get_user(self):
         response = client.post(
-            "/register/",
+            "/register",
             json=self.user_request,
         )
         assert response.status_code == 200, response.text
@@ -88,7 +88,7 @@ class TestCreateAndGet(TestSetup):
 
     def test_create_and_get_team(self):
         response = client.post(
-            "/teams/",
+            "/teams",
             json=self.team_request,
         )
         assert response.status_code == 200, response.text
@@ -103,7 +103,7 @@ class TestCreateAndGet(TestSetup):
 
     def test_create_and_get_room(self):
         response = client.post(
-            "/rooms/",
+            "/rooms",
             json=self.room_request,
         )
         assert response.status_code == 200, response.text
@@ -118,11 +118,11 @@ class TestCreateAndGet(TestSetup):
 
     def test_create_and_get_desk_with_no_team(self):
         client.post(
-            "/rooms/",
+            "/rooms",
             json=self.room_request,
         )
         response = client.post(
-            "/desks/",
+            "/desks",
             json=self.desk_request_no_team,
         )
         assert response.status_code == 200, response.text
@@ -141,17 +141,17 @@ class TestCreateAndGet(TestSetup):
 
     def test_create_and_get_desk_with_team(self):
         client.post(
-            "/rooms/",
+            "/rooms",
             json=self.room_request,
         )
 
         client.post(
-            "/teams/",
+            "/teams",
             json=self.team_request,
         )
 
         response = client.post(
-            "/desks/",
+            "/desks",
             json=self.desk_request,
         )
         assert response.status_code == 200, response.text
@@ -172,27 +172,27 @@ class TestCreateAndGet(TestSetup):
 
     def test_create_and_get_booking(self):
         client.post(
-            "/register/",
+            "/register",
             json=self.user_request,
         )
 
         client.post(
-            "/rooms/",
+            "/rooms",
             json=self.room_request,
         )
 
         client.post(
-            "/teams/",
+            "/teams",
             json=self.team_request,
         )
 
         client.post(
-            "/desks/",
+            "/desks",
             json=self.desk_request,
         )
 
         response = client.post(
-            "/bookings/",
+            "/bookings",
             json=self.booking_request,
         )
         assert response.status_code == 200, response.text
@@ -218,12 +218,12 @@ class TestCreateAndGet(TestSetup):
 class TestUserAuth(TestSetup):
     def test_register_and_login(self):
         client.post(
-            "/register/",
+            "/register",
             json=self.user_request,
         )
 
         response = client.post(
-            "/login/",
+            "/login",
             data=self.user_request, 
             headers=self.headers
         )
@@ -232,12 +232,12 @@ class TestUserAuth(TestSetup):
         
     def test_register_and_fail_login(self):
         client.post(
-            "/register/",
+            "/register",
             json=self.user_request,
         )
 
         response = client.post(
-            "/login/",
+            "/login",
             data=self.user_request_invalid, 
             headers=self.headers
         )

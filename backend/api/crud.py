@@ -21,7 +21,7 @@ def get_users(db: Session, skip: int = 0, limit: int = 100):
 def create_user(db: Session, user: schemas.UserCreate):
     # Do hashing here
     db_user = models.User(
-        email=user.email, username=user.username, hashed_password=auth.get_hashed_password(user.password))
+        email=user.email, username=user.username, hashed_password=auth.get_hashed_password(user.password), admin=user.admin)
     db.add(db_user)
     db.commit()
     db.refresh(db_user)

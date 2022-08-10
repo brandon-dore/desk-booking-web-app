@@ -5,10 +5,10 @@ from pydantic import BaseModel
 
 
 class UserBase(BaseModel):
-    id: int
     username: str
     email: str
-    assigned_team: str = None
+    assigned_team: Union[str, None] = None
+    admin: bool = False
 
 
 class UserCreate(UserBase):
@@ -16,14 +16,13 @@ class UserCreate(UserBase):
 
 
 class User(UserBase):
-    pass
+    id: int
 
     class Config:
         orm_mode = True
 
 
 class TeamBase(BaseModel):
-    id: int
     name: str
 
 
@@ -32,14 +31,13 @@ class TeamCreate(TeamBase):
 
 
 class Team(TeamBase):
-    pass
+    id: int
 
     class Config:
         orm_mode = True
 
 
 class RoomBase(BaseModel):
-    id: int
     name: str
 
 
@@ -48,17 +46,16 @@ class RoomCreate(TeamBase):
 
 
 class Room(TeamBase):
-    pass
+    id: int
 
     class Config:
         orm_mode = True
 
 
 class DeskBase(BaseModel):
-    id: int
     number: int
     room: str
-    assigned_team: str = None
+    assigned_team: Union[str, None] = None
 
 
 class DeskCreate(DeskBase):
@@ -66,14 +63,13 @@ class DeskCreate(DeskBase):
 
 
 class Desk(DeskBase):
-    pass
+    id: int
 
     class Config:
         orm_mode = True
 
 
 class BookingBase(BaseModel):
-    id: int
     approved_status: bool
     date: datetime.date
 
@@ -85,6 +81,7 @@ class BookingCreate(BookingBase):
 
 
 class Booking(BookingBase):
+    id: int
     desk: Desk
     user: User
 
