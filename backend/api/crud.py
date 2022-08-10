@@ -14,12 +14,12 @@ def get_user(db: Session, username: str):
     return db.query(models.User).filter(models.User.username == username).first()
 
 
-def get_users(db: Session, skip: int = 0, limit: int = 100):
-    return db.query(models.User).offset(skip).limit(limit).all()
+def get_users(db: Session, _start: int = 0, _end: int = 100, _order: str = "ASC", _sort: str = "id"):
+    users_id = getattr(models.User, _sort).asc() if _order.upper() == "ASC" else getattr(models.User, _sort).desc()
+    return db.query(models.User).order_by(users_id).offset(_start).limit(_end).all()
 
 
-def create_user(db: Session, user: schemas.UserCreate):
-    # Do hashing here
+def create_user(db: Session, user: schemas.UserCreate):    
     db_user = models.User(
         email=user.email, username=user.username, hashed_password=auth.get_hashed_password(user.password), admin=user.admin)
     db.add(db_user)
@@ -36,8 +36,9 @@ def get_team_by_name(db: Session, team_name: str):
     return db.query(models.Team).filter(models.Team.name == team_name).first()
 
 
-def get_teams(db: Session, skip: int = 0, limit: int = 100):
-    return db.query(models.Team).offset(skip).limit(limit).all()
+def get_teams(db: Session, _start: int = 0, _end: int = 100, _order: str = "ASC", _sort: str = "id"):
+    teams_id = getattr(models.Team, _sort).asc() if _order.upper() == "ASC" else getattr(models.Team, _sort).desc()
+    return db.query(models.Team).order_by(teams_id).offset(_start).limit(_end).all()
 
 
 def create_team(db: Session, team: schemas.TeamCreate):
@@ -56,8 +57,9 @@ def get_room_by_name(db: Session, room_name: str):
     return db.query(models.Room).filter(models.Room.name == room_name).first()
 
 
-def get_rooms(db: Session, skip: int = 0, limit: int = 100):
-    return db.query(models.Room).offset(skip).limit(limit).all()
+def get_rooms(db: Session, _start: int = 0, _end: int = 100, _order: str = "ASC", _sort: str = "id"):
+    rooms_id = getattr(models.Room, _sort).asc() if _order.upper() == "ASC" else getattr(models.Room, _sort).desc()
+    return db.query(models.Room).order_by(rooms_id).offset(_start).limit(_end).all()
 
 
 def create_room(db: Session, room: schemas.RoomCreate):
@@ -76,8 +78,9 @@ def get_desk_by_room_and_number(db: Session, desk_number: int, room_name: str):
     return db.query(models.Desk).filter(and_(models.Desk.room == room_name, models.Desk.number == desk_number)).first()
 
 
-def get_desks(db: Session, skip: int = 0, limit: int = 100):
-    return db.query(models.Desk).offset(skip).limit(limit).all()
+def get_desks(db: Session, _start: int = 0, _end: int = 100, _order: str = "ASC", _sort: str = "id"):
+    desks_id = getattr(models.Desk, _sort).asc() if _order.upper() == "ASC" else getattr(models.Desk, _sort).desc()
+    return db.query(models.Desk).order_by(desks_id).offset(_start).limit(_end).all()
 
 
 def create_desk(db: Session, desk: schemas.DeskCreate):
@@ -102,10 +105,9 @@ def get_booking_by_desk_and_date(db: Session, desk_number: int, date: datetime.d
     except NoResultFound:
         return None
 
-
-def get_bookings(db: Session, skip: int = 0, limit: int = 100):
-    return db.query(models.Booking).offset(skip).limit(limit).all()
-
+def get_bookings(db: Session, _start: int = 0, _end: int = 100, _order: str = "ASC", _sort: str = "id"):
+    bookings_id = getattr(models.Booking, _sort).asc() if _order.upper() == "ASC" else getattr(models.Booking, _sort).desc()
+    return db.query(models.Booking).order_by(bookings_id).offset(_start).limit(_end).all()
 
 def create_booking(db: Session, booking: schemas.BookingCreate):
     try:

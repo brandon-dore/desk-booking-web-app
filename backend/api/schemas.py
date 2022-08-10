@@ -79,19 +79,18 @@ class BookingCreate(BookingBase):
     username: str
     room_name: str
 
-
 class Booking(BookingBase):
     id: int
-    desk: Desk
-    user: User
+    desk_id: int
+    user_id: int
 
     class Config:
         orm_mode = True
 
-
-class Overview(BaseModel):
-    booking: Booking
+class BookingSummary(BookingBase):
+    id: int
     desk: Desk
+    user: User
 
     class Config:
         orm_mode = True

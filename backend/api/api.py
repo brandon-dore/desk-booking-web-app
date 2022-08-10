@@ -81,8 +81,8 @@ async def get_me(user: schemas.User = Depends(auth.get_current_user)):
 
 
 @app.get("/users", response_model=list[schemas.User])
-def read_users(response: Response, skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
-    users = crud.get_users(db, skip=skip, limit=limit)
+def read_users(response: Response, _start: int = 0, _end: int = 100, _order: str = "ASC", _sort: str = "id", db: Session = Depends(get_db)):
+    users = crud.get_users(db, _start=_start, _end=_end, _order=_order, _sort=_sort )
     response.headers["X-Total-Count"] = str(len(users))
     response.headers['Access-Control-Expose-Headers'] = 'X-Total-Count'
     return users
@@ -107,8 +107,8 @@ def create_team(team: schemas.TeamCreate, db: Session = Depends(get_db)):
 
 
 @app.get("/teams", response_model=list[schemas.Team])
-def read_teams(response: Response, skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
-    teams = crud.get_teams(db, skip=skip, limit=limit)
+def read_teams(response: Response, _start: int = 0, _end: int = 100, _order: str = "ASC", _sort: str = "id", db: Session = Depends(get_db)):
+    teams = crud.get_teams(db, _start=_start, _end=_end, _order=_order, _sort=_sort)
     response.headers["X-Total-Count"] = str(len(teams))
     response.headers['Access-Control-Expose-Headers'] = 'X-Total-Count'
     return teams
@@ -133,8 +133,8 @@ def create_room(room: schemas.RoomCreate, db: Session = Depends(get_db)):
 
 
 @app.get("/rooms", response_model=list[schemas.Room])
-def read_rooms(response: Response, skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
-    rooms = crud.get_rooms(db, skip=skip, limit=limit)
+def read_rooms(response: Response, _start: int = 0, _end: int = 100, _order: str = "ASC", _sort: str = "id", db: Session = Depends(get_db)):
+    rooms = crud.get_rooms(db, _start=_start, _end=_end, _order=_order, _sort=_sort)
     response.headers["X-Total-Count"] = str(len(rooms))
     response.headers['Access-Control-Expose-Headers'] = 'X-Total-Count'
     return rooms
@@ -160,8 +160,8 @@ def create_desk(desk: schemas.DeskCreate, db: Session = Depends(get_db)):
 
 
 @app.get("/desks", response_model=list[schemas.Desk])
-def read_desks(response: Response, skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
-    desks = crud.get_desks(db, skip=skip, limit=limit)
+def read_desks(response: Response, _start: int = 0, _end: int = 100, _order: str = "ASC", _sort: str = "id", db: Session = Depends(get_db)):
+    desks = crud.get_desks(db, _start=_start, _end=_end, _order=_order, _sort=_sort)
     response.headers["X-Total-Count"] = str(len(desks))
     response.headers['Access-Control-Expose-Headers'] = 'X-Total-Count'
     return desks
@@ -186,16 +186,30 @@ def create_booking(booking: schemas.BookingCreate, db: Session = Depends(get_db)
         raise HTTPException(status_code=400, detail="Booking already exists")
     return crud.create_booking(db=db, booking=booking)
 
-
 @app.get("/bookings", response_model=list[schemas.Booking])
-def read_bookings(response: Response, skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
-    bookings = crud.get_bookings(db=db, skip=skip, limit=limit)
+def read_bookings(response: Response, _start: int = 0, _end: int = 100, _order: str = "ASC", _sort: str = "id", db: Session = Depends(get_db)):
+    bookings = crud.get_bookings(db=db, _start=_start, _end=_end, _order=_order, _sort=_sort)
+    response.headers["X-Total-Count"] = str(len(bookings))
+    response.headers['Access-Control-Expose-Headers'] = 'X-Total-Count'
+    return bookings
+
+@app.get("/bookings/summary", response_model=list[schemas.BookingSummary])
+def read_bookings(response: Response, _start: int = 0, _end: int = 100, _order: str = "ASC", _sort: str = "id", db: Session = Depends(get_db)):
+    bookings = crud.get_bookings(db=db, _start=_start, _end=_end, _order=_order, _sort=_sort)
     response.headers["X-Total-Count"] = str(len(bookings))
     response.headers['Access-Control-Expose-Headers'] = 'X-Total-Count'
     return bookings
 
 
 @app.get("/bookings/{date}/{username}", response_model=schemas.Booking)
+def read_booking(date: date, username: str, db: Session = Depends(get_db)):
+    db_booking = crud.get_booking(
+        db, date=date, username=username)
+    if db_booking is None:
+        raise HTTPException(status_code=404, detail="Booking not found")
+    return db_booking
+
+@app.get("/bookings/{date}/{username}/summary", response_model=schemas.BookingSummary)
 def read_booking(date: date, username: str, db: Session = Depends(get_db)):
     db_booking = crud.get_booking(
         db, date=date, username=username)
