@@ -179,6 +179,7 @@ def read_desks(response: Response, _start: int = 0, _end: int = 100, _order: str
     response.headers['Access-Control-Expose-Headers'] = 'X-Total-Count'
     return desks
 
+
 @app.get("/desks/{desk_id}", response_model=schemas.Desk)
 def read_desk(desk_id: int, db: Session = Depends(get_db)):
     db_desk = crud.get_desk(
@@ -186,6 +187,7 @@ def read_desk(desk_id: int, db: Session = Depends(get_db)):
     if db_desk is None:
         raise HTTPException(status_code=404, detail="Desk not found")
     return db_desk
+
 
 @app.get("/desks/{room_id}/{desk_number}", response_model=schemas.Desk)
 def read_desk(room_id: int, desk_number: int, db: Session = Depends(get_db)):
@@ -219,7 +221,7 @@ def delete_desk(desk_id: int, db: Session = Depends(get_db)):
 @app.post("/bookings", response_model=schemas.Booking)
 def create_booking(booking: schemas.BookingCreate, db: Session = Depends(get_db)):
     db_booking = crud.get_booking_by_desk_and_date(
-        db, desk_number=booking.desk_number, room_id=booking.room_id, date=booking.date)
+        db, desk_id=booking.desk_id, date=booking.date)
     if db_booking:
         raise HTTPException(status_code=400, detail="Booking already exists")
     return crud.create_booking(db=db, booking=booking)
@@ -235,7 +237,7 @@ def read_bookings(response: Response, _start: int = 0, _end: int = 100, _order: 
 
 
 @app.get("/bookings/summary", response_model=list[schemas.BookingSummary])
-def read_bookings(response: Response, _start: int = 0, _end: int = 100, _order: str = "ASC", _sort: str = "id", db: Session = Depends(get_db)):
+def read_bookings_summary(response: Response, _start: int = 0, _end: int = 100, _order: str = "ASC", _sort: str = "id", db: Session = Depends(get_db)):
     bookings = crud.get_bookings(
         db=db, _start=_start, _end=_end, _order=_order, _sort=_sort)
     response.headers["X-Total-Count"] = str(len(bookings))
@@ -253,7 +255,7 @@ def read_booking(date: date, user_id: int, db: Session = Depends(get_db)):
 
 
 @app.get("/bookings/{date}/{user_id}/summary", response_model=schemas.BookingSummary)
-def read_booking(date: date, user_id: int, db: Session = Depends(get_db)):
+def read_booking_summary(date: date, user_id: int, db: Session = Depends(get_db)):
     db_booking = crud.get_booking(
         db, date=date, user_id=user_id)
     if db_booking is None:

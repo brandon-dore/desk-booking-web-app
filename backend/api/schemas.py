@@ -79,18 +79,16 @@ class DeskUpdate(BaseModel):
 class BookingBase(BaseModel):
     approved_status: bool
     date: datetime.date
+    desk_id: int
+    user_id: int
 
 
 class BookingCreate(BookingBase):
-    desk_number: int
-    username: str
-    room_id: int
+    pass
 
 
 class Booking(BookingBase):
     id: int
-    desk_id: int
-    user_id: int
 
     class Config:
         orm_mode = True

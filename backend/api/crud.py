@@ -120,16 +120,13 @@ def delete_desk(db: Session, desk_id: int):
     db.commit()
 
 
-def get_booking(db: Session, date: datetime.date, user_id: str):
-    user_info = get_user(db, user_id=user_id)
-    return db.query(models.Booking).filter(and_(models.Booking.date == date, models.Booking.user_id == user_info.id)).first()
+def get_booking(db: Session, booking_id: int):
+    return db.query(models.Booking).filter(models.Booking.id == booking_id).first()
 
 
-def get_booking_by_desk_and_date(db: Session, desk_number: int, date: datetime.date, room_id: str):
+def get_booking_by_desk_and_date(db: Session, desk_id: int, date: datetime.date):
     try:
-        desk_info = db.query(models.Desk).filter(
-            and_(models.Desk.number == desk_number, models.Desk.room_id == room_id)).one()
-        return db.query(models.Booking).filter(and_(models.Booking.desk_id == desk_info.id, models.Booking.date == date)).first()
+        return db.query(models.Booking).filter(and_(models.Booking.desk_id == desk_id, models.Booking.date == date)).first()
     except NoResultFound:
         return None
 
@@ -141,16 +138,8 @@ def get_bookings(db: Session, _start: int = 0, _end: int = 100, _order: str = "A
 
 
 def create_booking(db: Session, booking: schemas.BookingCreate):
-    try:
-        user_info = db.query(models.User).filter(
-            models.User.username == booking.username).one()
-        desk_info = db.query(models.Desk).filter(and_(
-            models.Desk.number == booking.desk_number, models.Desk.room_id == booking.room_id)).one()
-    except NoResultFound:
-        raise HTTPException(status_code=404, detail="User or Desk not found")
-
     db_booking = models.Booking(
-        user_id=user_info.id, desk_id=desk_info.id, date=booking.date, approved_status=booking.approved_status)
+        user_id=booking.user_id, desk_id=booking.desk_id, date=booking.date, approved_status=booking.approved_status)
     db.add(db_booking)
     db.commit()
     db.refresh(db_booking)
