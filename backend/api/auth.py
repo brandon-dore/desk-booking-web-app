@@ -52,8 +52,8 @@ def generic_token_creation(data: dict, expires_delta: timedelta, token_type: str
     return encoded_jwt
 
 
-def authenticate_user(db: Session, email: str, password: str):
-    user = crud.get_user(db, email)
+def authenticate_user(db: Session, username: str, password: str):
+    user = crud.get_user_by_username(db, username)
     if not user:
         return False
     if not verify_password(password, user.hashed_password):

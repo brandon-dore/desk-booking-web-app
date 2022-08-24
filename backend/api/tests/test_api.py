@@ -36,7 +36,7 @@ class TestSetup:
         Base.metadata.create_all(bind=engine)
         yield
         Base.metadata.drop_all(bind=engine)
-        
+
     user_request = {
         "username": "user5482",
         "email": "test@test.com",
@@ -47,26 +47,19 @@ class TestSetup:
         "email": "test@test.com",
         "password": "testpass56"
     }
-    team_request = {"name": "Test Team"}
     room_request = {"name": "Test Room"}
-    desk_request_no_team = {
-        "number": 4,
-        "room": "Test Room",
-    }
     desk_request = {
         "number": 4,
-        "room": "Test Room",
-        "assigned_team": "Test Team"
+        "room_id": 1,
     }
     booking_request = {
         "approved_status": False,
         "date": str(datetime.date(2020, 5, 17)),
         "desk_number": 4,
         "username": "user5482",
-        "room_name": "Test Room"
+        "room_id": 1
     }
     headers = {'Content-Type': 'application/x-www-form-urlencoded'}
-    
 
 
 class TestCreateAndGet(TestSetup):
@@ -79,27 +72,11 @@ class TestCreateAndGet(TestSetup):
         assert response.status_code == 200, response.text
         data = response.json()
         assert data["email"] == "test@test.com"
-        username = data["username"]
 
-        response = client.get(f"/users/{username}")
+        response = client.get(f"/users/{1}")
         assert response.status_code == 200, response.text
         data = response.json()
         assert data["email"] == "test@test.com"
-
-    def test_create_and_get_team(self):
-        response = client.post(
-            "/teams",
-            json=self.team_request,
-        )
-        assert response.status_code == 200, response.text
-        data = response.json()
-        assert data["name"] == "Test Team"
-        team_name = data["name"]
-
-        response = client.get(f"/teams/{team_name}")
-        assert response.status_code == 200, response.text
-        data = response.json()
-        assert data["name"] == "Test Team"
 
     def test_create_and_get_room(self):
         response = client.post(
@@ -109,47 +86,17 @@ class TestCreateAndGet(TestSetup):
         assert response.status_code == 200, response.text
         data = response.json()
         assert data["name"] == "Test Room"
-        room_name = data["name"]
 
-        response = client.get(f"/rooms/{room_name}")
+        response = client.get(f"/rooms/{1}")
         assert response.status_code == 200, response.text
         data = response.json()
         assert data["name"] == "Test Room"
 
-    def test_create_and_get_desk_with_no_team(self):
+    def test_create_and_get_desk(self):
         client.post(
             "/rooms",
             json=self.room_request,
         )
-        response = client.post(
-            "/desks",
-            json=self.desk_request_no_team,
-        )
-        assert response.status_code == 200, response.text
-        data = response.json()
-        assert data["number"] == 4
-        assert data["room"] == "Test Room"
-
-        desk_number = data["number"]
-        room_name = data["room"]
-
-        response = client.get(f"/desks/{room_name}/{desk_number}")
-        assert response.status_code == 200, response.text
-        data = response.json()
-        assert data["number"] == 4
-        assert data["room"] == "Test Room"
-
-    def test_create_and_get_desk_with_team(self):
-        client.post(
-            "/rooms",
-            json=self.room_request,
-        )
-
-        client.post(
-            "/teams",
-            json=self.team_request,
-        )
-
         response = client.post(
             "/desks",
             json=self.desk_request,
@@ -157,40 +104,27 @@ class TestCreateAndGet(TestSetup):
         assert response.status_code == 200, response.text
         data = response.json()
         assert data["number"] == 4
-        assert data["room"] == "Test Room"
-        assert data["assigned_team"] == "Test Team"
+        assert data["room_id"] == 1
 
-        desk_number = data["number"]
-        room_name = data["room"]
-
-        response = client.get(f"/desks/{room_name}/{desk_number}")
+        response = client.get(f"/desks/{1}")
         assert response.status_code == 200, response.text
         data = response.json()
         assert data["number"] == 4
-        assert data["room"] == "Test Room"
-        assert data["assigned_team"] == "Test Team"
+        assert data["room_id"] == 1
 
     def test_create_and_get_booking(self):
         client.post(
             "/register",
             json=self.user_request,
         )
-
         client.post(
             "/rooms",
             json=self.room_request,
         )
-
-        client.post(
-            "/teams",
-            json=self.team_request,
-        )
-
         client.post(
             "/desks",
             json=self.desk_request,
         )
-
         response = client.post(
             "/bookings",
             json=self.booking_request,
@@ -199,21 +133,19 @@ class TestCreateAndGet(TestSetup):
         data = response.json()
         assert data["approved_status"] == False
         assert data["date"] == str(datetime.date(2020, 5, 17))
-        assert data["desk"]["number"] == 4
-        assert data["user"]["email"] == "test@test.com"
-        assert data["desk"]["room"] == "Test Room"
+        assert data["user_id"] == 1
+        assert data["desk_id"] == 1
 
         date = data["date"]
-        username = data["user"]["username"]
 
-        response = client.get(f"/bookings/{date}/{username}")
+        response = client.get(f"/bookings/{date}/{1}")
         assert response.status_code == 200, response.text
         data = response.json()
         assert data["approved_status"] == False
         assert data["date"] == str(datetime.date(2020, 5, 17))
-        assert data["desk"]["number"] == 4
-        assert data["user"]["email"] == "test@test.com"
-        assert data["desk"]["room"] == "Test Room"
+        assert data["desk_id"] == 1
+        assert data["user_id"] == 1
+
 
 class TestUserAuth(TestSetup):
     def test_register_and_login(self):
@@ -224,12 +156,12 @@ class TestUserAuth(TestSetup):
 
         response = client.post(
             "/login",
-            data=self.user_request, 
+            data=self.user_request,
             headers=self.headers
         )
-        
+
         assert response.status_code == 200, response.text
-        
+
     def test_register_and_fail_login(self):
         client.post(
             "/register",
@@ -238,9 +170,8 @@ class TestUserAuth(TestSetup):
 
         response = client.post(
             "/login",
-            data=self.user_request_invalid, 
+            data=self.user_request_invalid,
             headers=self.headers
         )
-        
-        assert response.status_code == 401, response.text
 
+        assert response.status_code == 401, response.text

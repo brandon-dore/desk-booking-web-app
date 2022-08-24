@@ -134,9 +134,9 @@ def read_rooms(response: Response, _start: int = 0, _end: int = 100, _order: str
     return rooms
 
 
-@app.get("/rooms/{room_name}", response_model=schemas.Room)
-def read_room(room_name: str, db: Session = Depends(get_db)):
-    db_room = crud.get_room_by_name(db, room_name=room_name)
+@app.get("/rooms/{room_id}", response_model=schemas.Room)
+def read_room(room_id: int, db: Session = Depends(get_db)):
+    db_room = crud.get_room(db, room_id=room_id)
     if db_room is None:
         raise HTTPException(status_code=404, detail="Room not found")
     return db_room
@@ -164,9 +164,9 @@ def delete_room(room_id: int, db: Session = Depends(get_db)):
 
 @app.post("/desks", response_model=schemas.Desk)
 def create_desk(desk: schemas.DeskCreate, db: Session = Depends(get_db)):
-    db_user = crud.get_desk_by_room_and_number(
-        db, room_name=desk.room_id, desk_number=desk.number)
-    if db_user:
+    db_desk = crud.get_desk_by_room_and_number(
+        db, room_id=desk.room_id, desk_number=desk.number)
+    if db_desk:
         raise HTTPException(status_code=400, detail="Desk already exists")
     return crud.create_desk(db=db, desk=desk)
 
@@ -179,14 +179,21 @@ def read_desks(response: Response, _start: int = 0, _end: int = 100, _order: str
     response.headers['Access-Control-Expose-Headers'] = 'X-Total-Count'
     return desks
 
-
-@app.get("/desks/{room_name}/{desk_number}", response_model=schemas.Desk)
-def read_desk(room_name: str, desk_number: int, db: Session = Depends(get_db)):
-    db_user = crud.get_desk_by_room_and_number(
-        db, room_name=room_name, desk_number=desk_number)
-    if db_user is None:
+@app.get("/desks/{desk_id}", response_model=schemas.Desk)
+def read_desk(desk_id: int, db: Session = Depends(get_db)):
+    db_desk = crud.get_desk(
+        db, desk_id=desk_id)
+    if db_desk is None:
         raise HTTPException(status_code=404, detail="Desk not found")
-    return db_user
+    return db_desk
+
+@app.get("/desks/{room_id}/{desk_number}", response_model=schemas.Desk)
+def read_desk(room_id: int, desk_number: int, db: Session = Depends(get_db)):
+    db_desk = crud.get_desk_by_room_and_number(
+        db, room_id=room_id, desk_number=desk_number)
+    if db_desk is None:
+        raise HTTPException(status_code=404, detail="Desk not found")
+    return db_desk
 
 
 @app.patch("/desks/{desk_id}")
@@ -212,7 +219,7 @@ def delete_desk(desk_id: int, db: Session = Depends(get_db)):
 @app.post("/bookings", response_model=schemas.Booking)
 def create_booking(booking: schemas.BookingCreate, db: Session = Depends(get_db)):
     db_booking = crud.get_booking_by_desk_and_date(
-        db, desk_number=booking.desk_number, room_name=booking.room_id, date=booking.date)
+        db, desk_number=booking.desk_number, room_id=booking.room_id, date=booking.date)
     if db_booking:
         raise HTTPException(status_code=400, detail="Booking already exists")
     return crud.create_booking(db=db, booking=booking)

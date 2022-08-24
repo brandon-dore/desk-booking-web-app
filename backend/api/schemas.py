@@ -7,7 +7,7 @@ from pydantic import BaseModel
 class UserBase(BaseModel):
     username: str
     email: str
-    admin: Union[bool, None] = None
+    admin: bool = False
 
 
 class UserCreate(UserBase):

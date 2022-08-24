@@ -48,7 +48,7 @@ def delete_user(db: Session, user_id: int):
 
 
 def get_room(db: Session, room_id: int):
-    return db.query(models.Desk).filter(models.Room.id == room_id).first()
+    return db.query(models.Room).filter(models.Room.id == room_id).first()
 
 
 def get_room_by_name(db: Session, room_name: str):
@@ -87,8 +87,8 @@ def get_desk(db: Session, desk_id: int):
     return db.query(models.Desk).filter(models.Desk.id == desk_id).first()
 
 
-def get_desk_by_room_and_number(db: Session, desk_number: int, room_name: str):
-    return db.query(models.Desk).filter(and_(models.Desk.room == room_name, models.Desk.number == desk_number)).first()
+def get_desk_by_room_and_number(db: Session, desk_number: int, room_id: int):
+    return db.query(models.Desk).filter(and_(models.Desk.room_id == room_id, models.Desk.number == desk_number)).first()
 
 
 def get_desks(db: Session, _start: int = 0, _end: int = 100, _order: str = "ASC", _sort: str = "id"):
@@ -128,7 +128,7 @@ def get_booking(db: Session, date: datetime.date, user_id: str):
 def get_booking_by_desk_and_date(db: Session, desk_number: int, date: datetime.date, room_id: str):
     try:
         desk_info = db.query(models.Desk).filter(
-            and_(models.Desk.number == desk_number, models.Desk.room == room_id)).one()
+            and_(models.Desk.number == desk_number, models.Desk.room_id == room_id)).one()
         return db.query(models.Booking).filter(and_(models.Booking.desk_id == desk_info.id, models.Booking.date == date)).first()
     except NoResultFound:
         return None
@@ -145,7 +145,7 @@ def create_booking(db: Session, booking: schemas.BookingCreate):
         user_info = db.query(models.User).filter(
             models.User.username == booking.username).one()
         desk_info = db.query(models.Desk).filter(and_(
-            models.Desk.number == booking.desk_number, models.Desk.room == booking.room_name)).one()
+            models.Desk.number == booking.desk_number, models.Desk.room_id == booking.room_id)).one()
     except NoResultFound:
         raise HTTPException(status_code=404, detail="User or Desk not found")
 
