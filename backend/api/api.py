@@ -11,7 +11,8 @@ from api.database import SessionLocal, engine
 
 models.Base.metadata.create_all(bind=engine)
 
-app = FastAPI(title="Desk Booking API", swagger_ui_parameters={"operationsSorter": "method"})
+app = FastAPI(title="Desk Booking API", swagger_ui_parameters={
+              "operationsSorter": "method"})
 
 origins = [
     "http://localhost",
@@ -77,7 +78,8 @@ def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
 
 @app.get("/users", response_model=list[schemas.User])
 def read_users(response: Response, _start: int = 0, _end: int = 100, _order: str = "ASC", _sort: str = "id", db: Session = Depends(get_db)):
-    users = crud.get_users(db, _start=_start, _end=_end, _order=_order, _sort=_sort )
+    users = crud.get_users(db, _start=_start, _end=_end,
+                           _order=_order, _sort=_sort)
     response.headers["X-Total-Count"] = str(len(users))
     response.headers['Access-Control-Expose-Headers'] = 'X-Total-Count'
     return users
@@ -90,9 +92,11 @@ def read_user(user_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="User not found")
     return db_user
 
+
 @app.get('/users/me', response_model=schemas.User)
 async def get_me(user: schemas.User = Depends(auth.get_current_user)):
     return user
+
 
 @app.patch("/users/{user_id}")
 def update_user(user_id: int, user: schemas.UserUpdate, db: Session = Depends(get_db)):
@@ -101,6 +105,7 @@ def update_user(user_id: int, user: schemas.UserUpdate, db: Session = Depends(ge
         raise HTTPException(status_code=404, detail="User not found")
     updated_user = crud.update_user(db=db, user=existing_user, updates=user)
     return updated_user
+
 
 @app.delete("/users/{user_id}", status_code=204)
 def delete_user(user_id: int, db: Session = Depends(get_db)):
@@ -122,7 +127,8 @@ def create_room(room: schemas.RoomCreate, db: Session = Depends(get_db)):
 
 @app.get("/rooms", response_model=list[schemas.Room])
 def read_rooms(response: Response, _start: int = 0, _end: int = 100, _order: str = "ASC", _sort: str = "id", db: Session = Depends(get_db)):
-    rooms = crud.get_rooms(db, _start=_start, _end=_end, _order=_order, _sort=_sort)
+    rooms = crud.get_rooms(db, _start=_start, _end=_end,
+                           _order=_order, _sort=_sort)
     response.headers["X-Total-Count"] = str(len(rooms))
     response.headers['Access-Control-Expose-Headers'] = 'X-Total-Count'
     return rooms
@@ -134,6 +140,24 @@ def read_room(room_name: str, db: Session = Depends(get_db)):
     if db_room is None:
         raise HTTPException(status_code=404, detail="Room not found")
     return db_room
+
+
+@app.patch("/rooms/{room_id}")
+def update_room(room_id: int, room: schemas.RoomUpdate, db: Session = Depends(get_db)):
+    existing_room = crud.get_room(db, room_id=room_id)
+    if existing_room is None:
+        raise HTTPException(status_code=404, detail="Room not found")
+    updated_room = crud.update_room(db=db, room=existing_room, updates=room)
+    return updated_room
+
+
+@app.delete("/rooms/{room_id}", status_code=204)
+def delete_room(room_id: int, db: Session = Depends(get_db)):
+    room_to_delete = crud.get_room(db, room_id=room_id)
+    if room_to_delete is None:
+        raise HTTPException(status_code=404, detail="Room not found")
+    crud.delete_room(db, room_id=room_id)
+
 
 # Desks
 
@@ -149,7 +173,8 @@ def create_desk(desk: schemas.DeskCreate, db: Session = Depends(get_db)):
 
 @app.get("/desks", response_model=list[schemas.Desk])
 def read_desks(response: Response, _start: int = 0, _end: int = 100, _order: str = "ASC", _sort: str = "id", db: Session = Depends(get_db)):
-    desks = crud.get_desks(db, _start=_start, _end=_end, _order=_order, _sort=_sort)
+    desks = crud.get_desks(db, _start=_start, _end=_end,
+                           _order=_order, _sort=_sort)
     response.headers["X-Total-Count"] = str(len(desks))
     response.headers['Access-Control-Expose-Headers'] = 'X-Total-Count'
     return desks
@@ -163,6 +188,24 @@ def read_desk(room_name: str, desk_number: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Desk not found")
     return db_user
 
+
+@app.patch("/desks/{desk_id}")
+def update_desk(desk_id: int, desk: schemas.DeskUpdate, db: Session = Depends(get_db)):
+    existing_desk = crud.get_desk(db, desk_id=desk_id)
+    if existing_desk is None:
+        raise HTTPException(status_code=404, detail="Desk not found")
+    updated_desk = crud.update_desk(db=db, desk=existing_desk, updates=desk)
+    return updated_desk
+
+
+@app.delete("/desks/{desk_id}", status_code=204)
+def delete_desk(desk_id: int, db: Session = Depends(get_db)):
+    desk_to_delete = crud.get_desk(db, desk_id=desk_id)
+    if desk_to_delete is None:
+        raise HTTPException(status_code=404, detail="Desk not found")
+    crud.delete_desk(db, desk_id=desk_id)
+
+
 # Bookings
 
 
@@ -174,16 +217,20 @@ def create_booking(booking: schemas.BookingCreate, db: Session = Depends(get_db)
         raise HTTPException(status_code=400, detail="Booking already exists")
     return crud.create_booking(db=db, booking=booking)
 
+
 @app.get("/bookings", response_model=list[schemas.Booking])
 def read_bookings(response: Response, _start: int = 0, _end: int = 100, _order: str = "ASC", _sort: str = "id", db: Session = Depends(get_db)):
-    bookings = crud.get_bookings(db=db, _start=_start, _end=_end, _order=_order, _sort=_sort)
+    bookings = crud.get_bookings(
+        db=db, _start=_start, _end=_end, _order=_order, _sort=_sort)
     response.headers["X-Total-Count"] = str(len(bookings))
     response.headers['Access-Control-Expose-Headers'] = 'X-Total-Count'
     return bookings
 
+
 @app.get("/bookings/summary", response_model=list[schemas.BookingSummary])
 def read_bookings(response: Response, _start: int = 0, _end: int = 100, _order: str = "ASC", _sort: str = "id", db: Session = Depends(get_db)):
-    bookings = crud.get_bookings(db=db, _start=_start, _end=_end, _order=_order, _sort=_sort)
+    bookings = crud.get_bookings(
+        db=db, _start=_start, _end=_end, _order=_order, _sort=_sort)
     response.headers["X-Total-Count"] = str(len(bookings))
     response.headers['Access-Control-Expose-Headers'] = 'X-Total-Count'
     return bookings
@@ -197,6 +244,7 @@ def read_booking(date: date, user_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Booking not found")
     return db_booking
 
+
 @app.get("/bookings/{date}/{user_id}/summary", response_model=schemas.BookingSummary)
 def read_booking(date: date, user_id: int, db: Session = Depends(get_db)):
     db_booking = crud.get_booking(
@@ -204,3 +252,21 @@ def read_booking(date: date, user_id: int, db: Session = Depends(get_db)):
     if db_booking is None:
         raise HTTPException(status_code=404, detail="Booking not found")
     return db_booking
+
+
+@app.patch("/bookings/{booking_id}")
+def update_booking(booking_id: int, booking: schemas.BookingUpdate, db: Session = Depends(get_db)):
+    existing_booking = crud.get_booking(db, booking_id=booking_id)
+    if existing_booking is None:
+        raise HTTPException(status_code=404, detail="Booking not found")
+    updated_booking = crud.update_booking(
+        db=db, booking=existing_booking, updates=booking)
+    return updated_booking
+
+
+@app.delete("/bookings/{booking_id}", status_code=204)
+def delete_booking(booking_id: int, db: Session = Depends(get_db)):
+    booking_to_delete = crud.get_booking(db, booking_id=booking_id)
+    if booking_to_delete is None:
+        raise HTTPException(status_code=404, detail="Booking not found")
+    crud.delete_booking(db, booking_id=booking_id)
