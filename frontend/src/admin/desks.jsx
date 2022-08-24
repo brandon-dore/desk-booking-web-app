@@ -7,7 +7,6 @@ export const DeskList = () => (
             <TextField source="id" />
             <NumberField source="number" />
             <TextField source="room" />
-            <TextField source="assigned_team" />
         </Datagrid>
     </List>
 );

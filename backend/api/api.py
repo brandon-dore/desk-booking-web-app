@@ -11,7 +11,7 @@ from api.database import SessionLocal, engine
 
 models.Base.metadata.create_all(bind=engine)
 
-app = FastAPI(title="Desk Booking API")
+app = FastAPI(title="Desk Booking API", swagger_ui_parameters={"operationsSorter": "method"})
 
 origins = [
     "http://localhost",
@@ -75,11 +75,6 @@ def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
     return crud.create_user(db=db, user=user)
 
 
-@app.get('/users/me', response_model=schemas.User)
-async def get_me(user: schemas.User = Depends(auth.get_current_user)):
-    return user
-
-
 @app.get("/users", response_model=list[schemas.User])
 def read_users(response: Response, _start: int = 0, _end: int = 100, _order: str = "ASC", _sort: str = "id", db: Session = Depends(get_db)):
     users = crud.get_users(db, _start=_start, _end=_end, _order=_order, _sort=_sort )
@@ -95,6 +90,10 @@ def read_user(user_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="User not found")
     return db_user
 
+@app.get('/users/me', response_model=schemas.User)
+async def get_me(user: schemas.User = Depends(auth.get_current_user)):
+    return user
+
 @app.patch("/users/{user_id}")
 def update_user(user_id: int, user: schemas.UserUpdate, db: Session = Depends(get_db)):
     existing_user = crud.get_user(db, user_id=user_id)
@@ -109,32 +108,6 @@ def delete_user(user_id: int, db: Session = Depends(get_db)):
     if user_to_delete is None:
         raise HTTPException(status_code=404, detail="User not found")
     crud.delete_user(db, user_id=user_id)
-        
-# Teams
-
-
-@app.post("/teams", response_model=schemas.Team)
-def create_team(team: schemas.TeamCreate, db: Session = Depends(get_db)):
-    db_team = crud.get_team_by_name(db, team_name=team.name)
-    if db_team:
-        raise HTTPException(status_code=400, detail="Team already exists")
-    return crud.create_team(db=db, team=team)
-
-
-@app.get("/teams", response_model=list[schemas.Team])
-def read_teams(response: Response, _start: int = 0, _end: int = 100, _order: str = "ASC", _sort: str = "id", db: Session = Depends(get_db)):
-    teams = crud.get_teams(db, _start=_start, _end=_end, _order=_order, _sort=_sort)
-    response.headers["X-Total-Count"] = str(len(teams))
-    response.headers['Access-Control-Expose-Headers'] = 'X-Total-Count'
-    return teams
-
-
-@app.get("/teams/{team_name}", response_model=schemas.Team)
-def read_team(team_name: str, db: Session = Depends(get_db)):
-    db_team = crud.get_team_by_name(db, team_name=team_name)
-    if db_team is None:
-        raise HTTPException(status_code=404, detail="Team not found")
-    return db_team
 
 # Rooms
 
@@ -216,18 +189,18 @@ def read_bookings(response: Response, _start: int = 0, _end: int = 100, _order: 
     return bookings
 
 
-@app.get("/bookings/{date}/{username}", response_model=schemas.Booking)
-def read_booking(date: date, username: str, db: Session = Depends(get_db)):
+@app.get("/bookings/{date}/{user_id}", response_model=schemas.Booking)
+def read_booking(date: date, user_id: int, db: Session = Depends(get_db)):
     db_booking = crud.get_booking(
-        db, date=date, username=username)
+        db, date=date, user_id=user_id)
     if db_booking is None:
         raise HTTPException(status_code=404, detail="Booking not found")
     return db_booking
 
-@app.get("/bookings/{date}/{username}/summary", response_model=schemas.BookingSummary)
-def read_booking(date: date, username: str, db: Session = Depends(get_db)):
+@app.get("/bookings/{date}/{user_id}/summary", response_model=schemas.BookingSummary)
+def read_booking(date: date, user_id: int, db: Session = Depends(get_db)):
     db_booking = crud.get_booking(
-        db, date=date, username=username)
+        db, date=date, user_id=user_id)
     if db_booking is None:
         raise HTTPException(status_code=404, detail="Booking not found")
     return db_booking

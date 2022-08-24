@@ -7,7 +7,6 @@ export const UserList = () => (
             <TextField source="id" />
             <TextField source="username" />
             <EmailField source="email" />
-            <TextField source="assigned_team" />
             <BooleanField source="admin" />
         </Datagrid>
     </List>

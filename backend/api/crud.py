@@ -41,28 +41,6 @@ def delete_user(db: Session, user_id: int):
     db.query(models.User).filter(models.User.id == user_id).delete()
     db.commit()
 
-
-def get_team(db: Session, team_id: int):
-    return db.query(models.Team).filter(models.Team.id == team_id).first()
-
-
-def get_team_by_name(db: Session, team_name: str):
-    return db.query(models.Team).filter(models.Team.name == team_name).first()
-
-
-def get_teams(db: Session, _start: int = 0, _end: int = 100, _order: str = "ASC", _sort: str = "id"):
-    teams_id = getattr(models.Team, _sort).asc() if _order.upper() == "ASC" else getattr(models.Team, _sort).desc()
-    return db.query(models.Team).order_by(teams_id).offset(_start).limit(_end).all()
-
-
-def create_team(db: Session, team: schemas.TeamCreate):
-    db_team = models.Team(name=team.name)
-    db.add(db_team)
-    db.commit()
-    db.refresh(db_team)
-    return db_team
-
-
 def get_room(db: Session, room_id: int):
     return db.query(models.Desk).filter(models.Room.id == room_id).first()
 
@@ -99,15 +77,15 @@ def get_desks(db: Session, _start: int = 0, _end: int = 100, _order: str = "ASC"
 
 def create_desk(db: Session, desk: schemas.DeskCreate):
     db_desk = models.Desk(
-        number=desk.number, room_id=desk.room_id, assigned_team=desk.assigned_team)
+        number=desk.number, room_id=desk.room_id)
     db.add(db_desk)
     db.commit()
     db.refresh(db_desk)
     return db_desk
 
 
-def get_booking(db: Session, date: datetime.date, username: str):
-    user_info = get_user(db, username=username)
+def get_booking(db: Session, date: datetime.date, user_id: str):
+    user_info = get_user(db, user_id=user_id)
     return db.query(models.Booking).filter(and_(models.Booking.date == date, models.Booking.user_id == user_info.id)).first()
 
 
