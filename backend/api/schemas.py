@@ -7,8 +7,8 @@ from pydantic import BaseModel
 class UserBase(BaseModel):
     username: str
     email: str
-    assigned_team: Union[str, None] = None
-    admin: bool = False
+    assigned_team: Union[int, None] = None
+    admin: Union[bool, None] = None
 
 
 class UserCreate(UserBase):
@@ -21,6 +21,14 @@ class User(UserBase):
     class Config:
         orm_mode = True
 
+class UserUpdate(BaseModel):
+    username: Union[str, None] = None
+    email: Union[str, None] = None
+    assigned_team: Union[int, None] = None
+    admin: Union[bool, None] = None
+
+    class Config:
+        orm_mode = True
 
 class TeamBase(BaseModel):
     name: str
@@ -54,8 +62,8 @@ class Room(TeamBase):
 
 class DeskBase(BaseModel):
     number: int
-    room: str
-    assigned_team: Union[str, None] = None
+    room_id: int
+    assigned_team: Union[int, None] = None
 
 
 class DeskCreate(DeskBase):
@@ -77,7 +85,7 @@ class BookingBase(BaseModel):
 class BookingCreate(BookingBase):
     desk_number: int
     username: str
-    room_name: str
+    room_id: int
 
 class Booking(BookingBase):
     id: int

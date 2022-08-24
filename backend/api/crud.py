@@ -10,9 +10,11 @@ from api import models, schemas, auth
 from datetime import datetime
 
 
-def get_user(db: Session, username: str):
-    return db.query(models.User).filter(models.User.username == username).first()
+def get_user(db: Session, user_id: int):
+    return db.query(models.User).filter(models.User.id == user_id).first()
 
+def get_user_by_username(db: Session, username: str):
+    return db.query(models.User).filter(models.User.username == username).first()
 
 def get_users(db: Session, _start: int = 0, _end: int = 100, _order: str = "ASC", _sort: str = "id"):
     users_id = getattr(models.User, _sort).asc() if _order.upper() == "ASC" else getattr(models.User, _sort).desc()
@@ -26,6 +28,18 @@ def create_user(db: Session, user: schemas.UserCreate):
     db.commit()
     db.refresh(db_user)
     return db_user
+
+def update_user(db: Session, user: models.User, updates: schemas.UserUpdate):
+    update_data = updates.dict(exclude_unset=True)
+    for key, value in update_data.items():
+        setattr(user, key, value)
+    db.commit()
+    updated_user = get_user(db, user.id)
+    return updated_user
+
+def delete_user(db: Session, user_id: int):
+    db.query(models.User).filter(models.User.id == user_id).delete()
+    db.commit()
 
 
 def get_team(db: Session, team_id: int):
@@ -85,7 +99,7 @@ def get_desks(db: Session, _start: int = 0, _end: int = 100, _order: str = "ASC"
 
 def create_desk(db: Session, desk: schemas.DeskCreate):
     db_desk = models.Desk(
-        number=desk.number, room=desk.room, assigned_team=desk.assigned_team)
+        number=desk.number, room_id=desk.room_id, assigned_team=desk.assigned_team)
     db.add(db_desk)
     db.commit()
     db.refresh(db_desk)
@@ -97,10 +111,10 @@ def get_booking(db: Session, date: datetime.date, username: str):
     return db.query(models.Booking).filter(and_(models.Booking.date == date, models.Booking.user_id == user_info.id)).first()
 
 
-def get_booking_by_desk_and_date(db: Session, desk_number: int, date: datetime.date, room_name: str):
+def get_booking_by_desk_and_date(db: Session, desk_number: int, date: datetime.date, room_id: str):
     try:
         desk_info = db.query(models.Desk).filter(
-            and_(models.Desk.number == desk_number, models.Desk.room == room_name)).one()
+            and_(models.Desk.number == desk_number, models.Desk.room == room_id)).one()
         return db.query(models.Booking).filter(and_(models.Booking.desk_id == desk_info.id, models.Booking.date == date)).first()
     except NoResultFound:
         return None

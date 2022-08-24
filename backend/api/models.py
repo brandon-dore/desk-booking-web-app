@@ -16,8 +16,8 @@ class User(Base):
     hashed_password = Column(String(128))
     admin = Column(Boolean, unique=False, nullable=False)
 
-    assigned_team = Column(String, ForeignKey(
-        'teams.name'), unique=False, nullable=True)
+    assigned_team = Column(Integer, ForeignKey(
+        'teams.id'), unique=False, nullable=True)
 
 
 class Team(Base):
@@ -45,14 +45,14 @@ class Desk(Base):
     id = Column(Integer, primary_key=True, index=True)
     number = Column(Integer, nullable=False)
 
-    room = Column(String, ForeignKey(
-        'rooms.name'), unique=False, nullable=False)
+    room_id = Column(Integer, ForeignKey(
+        'rooms.id'), unique=False, nullable=False)
 
-    assigned_team = Column(String, ForeignKey(
-        'teams.name'), unique=False, nullable=True)
+    assigned_team = Column(Integer, ForeignKey(
+        'teams.id'), unique=False, nullable=True)
 
     __table_args__ = (UniqueConstraint(
-        'number', 'room', name='_desk_room_uc'),
+        'number', 'room_id', name='_desk_room_uc'),
     )
 
 
