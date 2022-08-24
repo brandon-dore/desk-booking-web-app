@@ -105,8 +105,9 @@ class BookingSummary(BookingBase):
 
 class BookingUpdate(BaseModel):
     desk_id: Union[int, None] = None
-    username: Union[str, None] = None
     user_id: Union[int, None] = None
+    date: Union[datetime.date, None] = None
+    approved_status: Union[bool, None] = None
 
     class Config:
         orm_mode = True

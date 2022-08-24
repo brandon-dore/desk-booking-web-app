@@ -74,7 +74,7 @@ def update_room(db: Session, room: models.Room, updates: schemas.RoomUpdate):
     for key, value in update_data.items():
         setattr(room, key, value)
     db.commit()
-    updated_room = get_user(db, room.id)
+    updated_room = get_room(db, room.id)
     return updated_room
 
 
@@ -111,7 +111,7 @@ def update_desk(db: Session, desk: models.Desk, updates: schemas.DeskUpdate):
     for key, value in update_data.items():
         setattr(desk, key, value)
     db.commit()
-    updated_desk = get_user(db, desk.id)
+    updated_desk = get_desk(db, desk.id)
     return updated_desk
 
 
@@ -151,7 +151,7 @@ def update_booking(db: Session, booking: models.Booking, updates: schemas.Bookin
     for key, value in update_data.items():
         setattr(booking, key, value)
     db.commit()
-    updated_booking = get_user(db, booking.id)
+    updated_booking = get_booking(db, booking.id)
     return updated_booking
 
 
