@@ -11,23 +11,28 @@ import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import AuthService from "../services/auth.service";
+import UserService from "../services/user.service";
 import DeskIcon from '@mui/icons-material/Desk';
 
 export default function TopBar() {
   const navigate = useNavigate();
   
   const [currentUser, setCurrentUser] = useState({
-    username: "",
     isLoggedIn: false,
+    admin: false
   });
+
   const [anchorEl, setAnchorEl] = React.useState(null);
 
   useEffect(() => {
-    const user = AuthService.getCurrentUser();
-    if (user !== "undefined" && user !== null) {
-      // Check if JWT is valid?
-      setCurrentUser({ username: currentUser, isLoggedIn: true });
-    }
+    UserService.getUserInfo().then(
+      (response) => {
+        setCurrentUser({ isLoggedIn: true, admin: response.data.admin });
+      },
+      (error) => {
+        console.log(error);
+      }
+    );
   }, []);
 
   const handleMenu = (event) => {
@@ -88,6 +93,7 @@ export default function TopBar() {
               onClose={handleClose}
             >
               <MenuItem onClick={handleClose}>My Account</MenuItem>
+              {currentUser.admin && <MenuItem onClick={() => navigate("/admin")}>Admin Panel</MenuItem>}
               <MenuItem onClick={handleLogout}>Logout</MenuItem>
             </Menu>
           </div>
