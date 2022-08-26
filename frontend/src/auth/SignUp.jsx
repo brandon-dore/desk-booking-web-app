@@ -11,6 +11,8 @@ const defaultValues = {
 };
 
 export const SignUp = () => {
+  const navigate = useNavigate();
+
   const [formValues, setFormValues] = useState(defaultValues);
 
   const [error, setError] = useState({
@@ -25,8 +27,6 @@ export const SignUp = () => {
       [name]: value,
     });
   };
-
-  const navigate = useNavigate();
 
   const handleSubmit = (e) => {
     e.preventDefault();
