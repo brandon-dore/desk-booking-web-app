@@ -53,7 +53,7 @@ def generic_token_creation(data: dict, expires_delta: timedelta, token_type: str
 
 
 def authenticate_user(db: Session, username: str, password: str):
-    user = crud.get_user_by_username(db, username)
+    user = crud.get_user_by_username(db, username=username)
     if not user:
         return False
     if not verify_password(password, user.hashed_password):
@@ -75,12 +75,11 @@ def get_current_user(db: Session = Depends(get_db), token: str = Depends(reuseab
         token_data = schemas.TokenData(username=username)
     except JWTError:
         raise credentials_exception
-    user = crud.get_user(db, username=token_data.username)
+    user = crud.get_user_by_username(db, username=token_data.username)
     if user is None:
         raise credentials_exception
     return user
 
 
-def get_current_active_user(db: Session, token: str):
-    current_user = get_current_user(db, token)
+def get_current_active_user(current_user: schemas.User = Depends(get_current_user)):
     return current_user
