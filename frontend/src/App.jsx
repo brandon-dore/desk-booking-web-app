@@ -39,7 +39,7 @@ const App = () => {
       <Routes>
         <Route exact path="/" element={<Login />} />
         <Route
-          path="/admin"
+          path="/admin/*"
           element={
             <RequireAuth redirectTo="/">
               <DeskBookingAdmin />

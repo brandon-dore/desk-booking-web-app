@@ -15,6 +15,7 @@ import DeskIcon from '@mui/icons-material/Desk';
 
 export default function TopBar() {
   const navigate = useNavigate();
+  
   const [currentUser, setCurrentUser] = useState({
     username: "",
     isLoggedIn: false,
