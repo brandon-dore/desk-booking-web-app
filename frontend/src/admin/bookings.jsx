@@ -1,5 +1,5 @@
 import * as React from "react";
-import { BooleanField, Datagrid, DateField, List, NumberField, TextField } from 'react-admin';
+import { BooleanField, Datagrid, DateField, List, ReferenceField, TextField } from 'react-admin';
 
 export const BookingList = () => (
     <List>
@@ -7,8 +7,12 @@ export const BookingList = () => (
             <TextField source="id" />
             <BooleanField source="approved_status" />
             <DateField source="date" />
-            <NumberField source="desk.id" />
-            <NumberField source="user.id" />
+            <ReferenceField source="user_id" reference="users">
+                <TextField source="username" />
+            </ReferenceField>
+            <ReferenceField source="desk_id" reference="desks">
+                <TextField source="number" />
+            </ReferenceField>
         </Datagrid>
     </List>
 );

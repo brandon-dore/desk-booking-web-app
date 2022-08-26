@@ -5,10 +5,9 @@ from pydantic import BaseModel
 
 
 class UserBase(BaseModel):
-    id: int
     username: str
     email: str
-    assigned_team: str = None
+    admin: bool = False
 
 
 class UserCreate(UserBase):
@@ -16,49 +15,46 @@ class UserCreate(UserBase):
 
 
 class User(UserBase):
-    pass
+    id: int
 
     class Config:
         orm_mode = True
 
 
-class TeamBase(BaseModel):
-    id: int
-    name: str
-
-
-class TeamCreate(TeamBase):
-    pass
-
-
-class Team(TeamBase):
-    pass
+class UserUpdate(BaseModel):
+    username: Union[str, None] = None
+    email: Union[str, None] = None
+    admin: Union[bool, None] = None
 
     class Config:
         orm_mode = True
 
 
 class RoomBase(BaseModel):
-    id: int
     name: str
 
 
-class RoomCreate(TeamBase):
+class RoomCreate(RoomBase):
     pass
 
 
-class Room(TeamBase):
-    pass
+class Room(RoomBase):
+    id: int
+
+    class Config:
+        orm_mode = True
+
+
+class RoomUpdate(BaseModel):
+    name: str
 
     class Config:
         orm_mode = True
 
 
 class DeskBase(BaseModel):
-    id: int
     number: int
-    room: str
-    assigned_team: str = None
+    room_id: int
 
 
 class DeskCreate(DeskBase):
@@ -66,25 +62,40 @@ class DeskCreate(DeskBase):
 
 
 class Desk(DeskBase):
-    pass
+    id: int
+
+    class Config:
+        orm_mode = True
+
+
+class DeskUpdate(BaseModel):
+    number: Union[int, None] = None
+    room_id: Union[int, None] = None
 
     class Config:
         orm_mode = True
 
 
 class BookingBase(BaseModel):
-    id: int
     approved_status: bool
     date: datetime.date
+    desk_id: int
+    user_id: int
 
 
 class BookingCreate(BookingBase):
-    desk_number: int
-    username: str
-    room_name: str
+    pass
 
 
 class Booking(BookingBase):
+    id: int
+
+    class Config:
+        orm_mode = True
+
+
+class BookingSummary(BookingBase):
+    id: int
     desk: Desk
     user: User
 
@@ -92,9 +103,11 @@ class Booking(BookingBase):
         orm_mode = True
 
 
-class Overview(BaseModel):
-    booking: Booking
-    desk: Desk
+class BookingUpdate(BaseModel):
+    desk_id: Union[int, None] = None
+    user_id: Union[int, None] = None
+    date: Union[datetime.date, None] = None
+    approved_status: Union[bool, None] = None
 
     class Config:
         orm_mode = True
@@ -108,18 +121,6 @@ class Token(BaseModel):
 
 class TokenData(BaseModel):
     username: Union[str, None] = None
-
-
-class UserOut(UserBase):
-    authors: List[TeamBase]
-
-
-class TeamOutUsers(TeamBase):
-    books: List[UserBase]
-
-
-class TeamOutDesks(TeamBase):
-    authors: List[DeskBase]
 
 
 class DeskOut(DeskBase):
