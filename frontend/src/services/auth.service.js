@@ -4,9 +4,10 @@ import jwt_decode from "jwt-decode";
 
 const API_URL = "http://localhost:8000/";
 class AuthService {
-  login(formValues) {
+  login(data) {
+    console.log(data)
     return axios
-      .post(API_URL + "login", qs.stringify(formValues))
+      .post(API_URL + "login", qs.stringify(data))
       .then((response) => {
         if (response.data.access_token) {
           localStorage.setItem("user", JSON.stringify(response.data));
@@ -17,8 +18,8 @@ class AuthService {
   logout() {
     localStorage.removeItem("user");
   }
-  register(formValues) {
-    return axios.post(API_URL + "register", formValues);
+  signUp(data) {
+    return axios.post(API_URL + "register", data);
   }
   getCurrentUser() {
     return JSON.parse(localStorage.getItem("user"));

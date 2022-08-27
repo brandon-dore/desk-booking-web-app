@@ -21,7 +21,7 @@ import { BookingList, BookingEdit, BookingCreate } from "./bookings";
 import { DeskList, DeskEdit, DeskCreate } from "./desks";
 
 import Dashboard from "./Dashboard";
-import UserService from "../services/user.service";
+import APIService from "../services/api.service";
 import TopBar from "../auth/TopBar";
 
 const httpClient = fetchUtils.fetchJson;
@@ -50,7 +50,7 @@ export const DeskBookingAdmin = () => {
   const [isAdmin, setIsAdmin] = useState(undefined);
 
   useEffect(() => {
-    UserService.getUserInfo().then(
+    APIService.getUserInfo().then(
       (response) => {
         console.log(response)
         setIsAdmin(response.data.admin);

@@ -11,7 +11,7 @@ import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import AuthService from "../services/auth.service";
-import UserService from "../services/user.service";
+import APIService from "../services/api.service";
 import DeskIcon from '@mui/icons-material/Desk';
 
 export default function TopBar() {
@@ -25,7 +25,7 @@ export default function TopBar() {
   const [anchorEl, setAnchorEl] = React.useState(null);
 
   useEffect(() => {
-    UserService.getUserInfo().then(
+    APIService.getUserInfo().then(
       (response) => {
         setCurrentUser({ isLoggedIn: true, admin: response.data.admin });
       },

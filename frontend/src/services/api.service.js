@@ -2,7 +2,7 @@ import axios from 'axios';
 import authHeader from './auth-header';
 const API_URL = 'http://localhost:8000/';
 
-class UserService {
+class APIService {
   getPublicContent() {
     return axios.get(API_URL + 'all');
   }
@@ -17,4 +17,4 @@ class UserService {
   }
 }
 
-export default new UserService();
+export default new APIService();
