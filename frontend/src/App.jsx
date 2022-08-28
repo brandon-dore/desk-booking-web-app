@@ -24,6 +24,7 @@ const App = () => {
       const decodedJwt = JSON.parse(atob(user.access_token.split(".")[1]));
       if (decodedJwt.exp * 1000 < Date.now()) {
         AuthService.logout();
+        navigate("/");
         navigate(0);
       }
     }

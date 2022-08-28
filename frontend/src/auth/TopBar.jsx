@@ -50,6 +50,7 @@ export default function TopBar() {
   const handleLogout = () => {
     setAnchorElUser(null);
     AuthService.logout();
+    navigate("/");
     navigate(0);
   };
 
