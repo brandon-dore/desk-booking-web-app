@@ -1,4 +1,4 @@
-import { Route, Routes, Navigate, useLocation } from "react-router-dom";
+import { Route, Routes, Navigate, useLocation, useNavigate } from "react-router-dom";
 import DeskBooking from "./desk-booking/DeskBooking";
 import Home from "./Home";
 import { DeskBookingAdmin } from "./admin/DeskBookingAdmin";
@@ -9,6 +9,7 @@ import AuthService from "./services/auth.service";
 
 const App = () => {
   let location = useLocation();
+  let navigate = useNavigate();
 
   useEffect(() => {
     const user = AuthService.getCurrentUser();
@@ -23,6 +24,7 @@ const App = () => {
       const decodedJwt = JSON.parse(atob(user.access_token.split(".")[1]));
       if (decodedJwt.exp * 1000 < Date.now()) {
         AuthService.logout();
+        navigate(0);
       }
     }
   }, [location]);

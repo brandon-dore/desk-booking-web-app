@@ -177,6 +177,13 @@ def read_desks(response: Response, range: str = "[0,9]", sort: str = "['id', 'AS
     response.headers['Access-Control-Expose-Headers'] = 'Content-Range'
     return desks
 
+@app.get("/desks/{room_id}", response_model=list[schemas.Desk])
+def read_desks_in_room(room_id: int, db: Session = Depends(get_db)):
+    desks = crud.get_desks_in_room(
+        db, room_id=room_id)
+    if desks is None:
+        raise HTTPException(status_code=404, detail="Room not found")
+    return desks
 
 @app.get("/desks/{desk_id}", response_model=schemas.Desk)
 def read_desk(desk_id: int, db: Session = Depends(get_db)):

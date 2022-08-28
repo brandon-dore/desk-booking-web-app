@@ -96,6 +96,9 @@ def get_desks(db: Session, range: list[int] = [0,9], sort: list[str] = ["id", "A
     ) == "ASC" else getattr(models.Desk, sort[0]).desc()
     return db.query(models.Desk).order_by(desks_id).offset(range[0]).limit(range[1]).all()
 
+def get_desks_in_room(db: Session, room_id: int):
+    desks_number = getattr(models.Desk, "number").asc()
+    return db.query(models.Desk).filter(models.Desk.room_id == room_id).order_by(desks_number).all()
 
 def create_desk(db: Session, desk: schemas.DeskCreate):
     db_desk = models.Desk(

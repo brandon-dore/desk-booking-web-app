@@ -19,7 +19,7 @@ const Home = () => {
     <>
       <TopBar />
       <Box sx={{ mx:5 }}>
-        {currentUser ? <p>Welcome Back. Click <Link to="/desk-booking">here</Link> to book a desk</p>:<p><Link to="/login">Login</Link>to view content</p>}
+        {currentUser ? <p>Welcome Back. Click <Link to="/desk-booking">here</Link> to book a desk</p>:<p><Link to="/login">Login</Link> to view content</p>}
     </Box>
     </>
   );
