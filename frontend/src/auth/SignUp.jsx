@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
-  Button,
   TextField,
   Grid,
   Container,
@@ -9,6 +8,7 @@ import {
   CssBaseline,
   Typography,
 } from "@mui/material";
+import LoadingButton from "@mui/lab/LoadingButton";
 import TopBar from "./TopBar";
 import AuthService from "../services/auth.service";
 import { useForm } from "react-hook-form";
@@ -18,6 +18,7 @@ import * as Yup from "yup";
 
 export const SignUp = () => {
   const [loading, setLoading] = useState(false);
+  const [response, setResponse] = useState(undefined);
 
   const navigate = useNavigate();
 
@@ -53,6 +54,7 @@ export const SignUp = () => {
         navigate("/");
       },
       () => {
+        setResponse("Registration failed. Please try again.")
         setLoading(false);
       }
     );
@@ -78,6 +80,7 @@ export const SignUp = () => {
           <Box
             sx={{ mt: 1 }}
           >
+            <form onSubmit={handleSubmit(onSubmit)} >
             <TextField
               required
               id="username"
@@ -132,16 +135,19 @@ export const SignUp = () => {
             <Typography variant="inherit" color="textSecondary">
               {errors.confirmPassword?.message}
             </Typography>
-            <Button
+            <Typography variant="inherit" color="textSecondary">
+              {response}
+            </Typography>
+            <LoadingButton
               type="submit"
               fullWidth
               variant="contained"
-              disabled={loading}
+              loading={loading}
               sx={{ mt: 3, mb: 2 }}
-              onClick={handleSubmit(onSubmit)}
             >
               Sign Up
-            </Button>
+            </LoadingButton>
+            </form>
             <Grid container>
               <Grid item>
                 <Link to="/">{"Already have an account? Login here."}</Link>
