@@ -12,6 +12,9 @@ class APIService {
   getDesks(roomId) {
     return axios.get(API_URL + 'desks/' + roomId, { headers: authHeader() });
   }
+  getBookings(date, roomId) {
+    return axios.get(API_URL + 'bookings/' + date + "/" + roomId, { headers: authHeader() });
+  }
 }
 
 export default new APIService();

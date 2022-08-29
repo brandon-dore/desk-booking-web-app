@@ -18,7 +18,7 @@ def get_user_by_username(db: Session, username: str):
     return db.query(models.User).filter(models.User.username == username).first()
 
 
-def get_users(db: Session, range: list[int] = [0,9], sort: list[str] = ["id", "ASC"]):
+def get_users(db: Session, range: list[int] = [0, 9], sort: list[str] = ["id", "ASC"]):
     users_id = getattr(models.User, sort[0]).asc() if sort[1].upper(
     ) == "ASC" else getattr(models.User, sort[0]).desc()
     return db.query(models.User).order_by(users_id).offset(range[0]).limit(range[1]).all()
@@ -55,7 +55,7 @@ def get_room_by_name(db: Session, room_name: str):
     return db.query(models.Room).filter(models.Room.name == room_name).first()
 
 
-def get_rooms(db: Session, range: list[int] = [0,9], sort: list[str] = ["id", "ASC"]):
+def get_rooms(db: Session, range: list[int] = [0, 9], sort: list[str] = ["id", "ASC"]):
     rooms_id = getattr(models.Room, sort[0]).asc() if sort[1].upper(
     ) == "ASC" else getattr(models.Room, sort[0]).desc()
     return db.query(models.Room).order_by(rooms_id).offset(range[0]).limit(range[1]).all()
@@ -91,14 +91,16 @@ def get_desk_by_room_and_number(db: Session, desk_number: int, room_id: int):
     return db.query(models.Desk).filter(and_(models.Desk.room_id == room_id, models.Desk.number == desk_number)).first()
 
 
-def get_desks(db: Session, range: list[int] = [0,9], sort: list[str] = ["id", "ASC"]):
+def get_desks(db: Session, range: list[int] = [0, 9], sort: list[str] = ["id", "ASC"]):
     desks_id = getattr(models.Desk, sort[0]).asc() if sort[1].upper(
     ) == "ASC" else getattr(models.Desk, sort[0]).desc()
     return db.query(models.Desk).order_by(desks_id).offset(range[0]).limit(range[1]).all()
 
+
 def get_desks_in_room(db: Session, room_id: int):
     desks_number = getattr(models.Desk, "number").asc()
     return db.query(models.Desk).filter(models.Desk.room_id == room_id).order_by(desks_number).all()
+
 
 def create_desk(db: Session, desk: schemas.DeskCreate):
     db_desk = models.Desk(
@@ -134,10 +136,19 @@ def get_booking_by_desk_and_date(db: Session, desk_id: int, date: datetime.date)
         return None
 
 
-def get_bookings(db: Session, range: list[int] = [0,9], sort: list[str] = ["id", "ASC"]):
+def get_bookings(db: Session, range: list[int] = [0, 9], sort: list[str] = ["id", "ASC"]):
     bookings_id = getattr(models.Booking, sort[0]).asc() if sort[1].upper(
     ) == "ASC" else getattr(models.Booking, sort[0]).desc()
     return db.query(models.Booking).order_by(bookings_id).offset(range[0]).limit(range[1]).all()
+
+
+def get_bookings_by_room(db: Session, room_id: int, date: datetime.date):
+    try:
+        print("HERE")
+        print(str(db.query(models.Booking).join(models.Desk).filter(and_(models.Desk.room_id == room_id, models.Booking.date == date.isoformat())).all()))
+        return db.query(models.Booking).join(models.Desk).filter(and_(models.Desk.room_id == room_id, models.Booking.date == date.isoformat())).all()
+    except NoResultFound:
+        return None
 
 
 def create_booking(db: Session, booking: schemas.BookingCreate):

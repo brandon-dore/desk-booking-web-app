@@ -5,11 +5,9 @@ from jose import JWTError, jwt
 from passlib.context import CryptContext
 from api.database import SessionLocal
 
-import datetime
-
 from api import schemas, crud
 
-from datetime import datetime, timedelta
+import datetime
 
 SECRET_KEY = "sW04AA2nYC8jXYHtXP4PBJ3YIzi+oyfbel137TkkpeGAGjUxhk6cFM32PdWKYZPL"
 ALGORITHM = "HS256"
@@ -40,9 +38,9 @@ def get_hashed_password(password: str):
     return pwd_context.hash(password)
 
 
-def generic_token_creation(data: dict, expires_delta: timedelta, token_type: str):
+def generic_token_creation(data: dict, expires_delta: datetime.timedelta, token_type: str):
     to_encode = data.copy()
-    expire = datetime.utcnow() + expires_delta
+    expire = datetime.datetime.utcnow() + expires_delta
     to_encode.update({"exp": expire})
     if token_type == "access":
         encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)

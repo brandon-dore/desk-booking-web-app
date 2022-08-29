@@ -2,7 +2,7 @@ import ast
 from fastapi import Depends, FastAPI, HTTPException, status, Response, Request, Query
 from fastapi.responses import RedirectResponse
 from sqlalchemy.orm import Session
-from datetime import timedelta, date
+import datetime
 from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
 
@@ -57,8 +57,8 @@ def login_and_get_token(form_data: OAuth2PasswordRequestForm = Depends(), db: Se
             detail="Incorrect username or password",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    access_token_expires = timedelta(minutes=auth.ACCESS_TOKEN_EXPIRE_MINUTES)
-    refresh_token_expires = timedelta(
+    access_token_expires = datetime.timedelta(minutes=auth.ACCESS_TOKEN_EXPIRE_MINUTES)
+    refresh_token_expires = datetime.timedelta(
         minutes=auth.REFRESH_TOKEN_EXPIRE_MINUTES)
 
     return {
@@ -265,22 +265,29 @@ def read_bookings_summary(booking_id: int, response: Response, db: Session = Dep
     return db_booking
 
 
-@app.get("/bookings/{date}/{user_id}", response_model=schemas.Booking)
-def read_booking(date: date, user_id: int, db: Session = Depends(get_db)):
-    db_booking = crud.get_booking(
-        db, date=date, user_id=user_id)
+# @app.get("/bookings/{date}/{user_id}", response_model=schemas.Booking)
+# def read_booking(date: datetime.date, user_id: int, db: Session = Depends(get_db)):
+#     db_booking = crud.get_booking(
+#         db, date=date, user_id=user_id)
+#     if db_booking is None:
+#         raise HTTPException(status_code=404, detail="Booking not found")
+#     return db_booking
+
+@app.get("/bookings/{date}/{room_id}", response_model=list[schemas.Booking])
+def read_bookings_by_room(date: datetime.date, room_id: int, db: Session = Depends(get_db)):
+    db_booking = crud.get_bookings_by_room(
+        db, date=date, room_id=room_id)
     if db_booking is None:
         raise HTTPException(status_code=404, detail="Booking not found")
     return db_booking
 
-
-@app.get("/bookings/{date}/{user_id}/summary", response_model=schemas.BookingSummary)
-def read_booking_summary(date: date, user_id: int, db: Session = Depends(get_db)):
-    db_booking = crud.get_booking(
-        db, date=date, user_id=user_id)
-    if db_booking is None:
-        raise HTTPException(status_code=404, detail="Booking not found")
-    return db_booking
+# @app.get("/bookings/{date}/{user_id}/summary", response_model=schemas.BookingSummary)
+# def read_booking_summary(date: datetime.date, user_id: int, db: Session = Depends(get_db)):
+#     db_booking = crud.get_booking(
+#         db, date=date, user_id=user_id)
+#     if db_booking is None:
+#         raise HTTPException(status_code=404, detail="Booking not found")
+#     return db_booking
 
 
 @app.patch("/bookings/{booking_id}")
