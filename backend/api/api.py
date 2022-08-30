@@ -274,7 +274,7 @@ def read_bookings_summary(booking_id: int, response: Response, db: Session = Dep
 #     return db_booking
 
 @app.get("/bookings/{date}/{room_id}", response_model=list[schemas.Booking])
-def read_bookings_by_room(date: datetime.date, room_id: int, db: Session = Depends(get_db)):
+def read_bookings_by_room(response: Response, date: datetime.date, room_id: int, range: str = "[0,9]", sort: str = "['id', 'ASC']", db: Session = Depends(get_db)):
     db_booking = crud.get_bookings_by_room(
         db, date=date, room_id=room_id)
     if db_booking is None:

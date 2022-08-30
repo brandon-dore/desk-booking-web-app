@@ -14,15 +14,15 @@ import MeetingRoomIcon from "@mui/icons-material/MeetingRoom";
 import DesktopWindowsIcon from "@mui/icons-material/DesktopWindows";
 import simpleRestDataProvider from "ra-data-simple-rest";
 
-import { Admin, Resource, fetchUtils } from "react-admin";
+import { Admin, Resource, fetchUtils, Layout  } from "react-admin";
 import { UserList, UserEdit, UserCreate } from "./users";
 import { RoomList, RoomEdit, RoomCreate } from "./rooms";
 import { BookingList, BookingEdit, BookingCreate } from "./bookings";
 import { DeskList, DeskEdit, DeskCreate } from "./desks";
-
+import MyAppBar from "../header/AdminAppBar";
 import Dashboard from "./Dashboard";
 import APIService from "../services/api.service";
-import TopBar from "../auth/TopBar";
+import TopBar from "../header/CommonAppBar";
 
 const httpClient = fetchUtils.fetchJson;
 
@@ -45,6 +45,8 @@ export const dataProvider = {
       body: JSON.stringify(diff(params.data, params.previousData)),
     }).then(({ json }) => ({ data: json })),
 };
+
+const MyLayout = (props) => <Layout {...props} appBar={MyAppBar} />;
 
 export const DeskBookingAdmin = () => {
   const [isAdmin, setIsAdmin] = useState(undefined);
@@ -91,6 +93,7 @@ export const DeskBookingAdmin = () => {
           basename="/admin"
           dashboard={Dashboard}
           dataProvider={dataProvider}
+          layout={MyLayout}
         >
           <Resource
             name="users"

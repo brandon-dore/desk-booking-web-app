@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader } from "@mui/material";
 
 const Dashboard = () => {
   return (
-    <Card>
+    <Card sx={{ mt: 2}}>
       <CardHeader title="Welcome to the administration dashboard" />
       <CardContent>
         This can be used to view the database in a GUI and perform all CRUD

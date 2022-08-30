@@ -16,8 +16,9 @@ import AuthService from "../services/auth.service";
 import APIService from "../services/api.service";
 import DeskIcon from "@mui/icons-material/Desk";
 import Avatar from "@mui/material/Avatar";
+import sloth from "../../avatar.png"
 
-export default function TopBar() {
+export default function CommonAppBar() {
   const navigate = useNavigate();
 
   const [currentUser, setCurrentUser] = useState({
@@ -37,7 +38,6 @@ export default function TopBar() {
       }
     );
   }, []);
-
 
   const handleOpenUserMenu = (event) => {
     setAnchorElUser(event.currentTarget);
@@ -91,17 +91,26 @@ export default function TopBar() {
                 Book a Desk
               </Button>
             )}
+            {currentUser.admin && (
+              <Button
+                onClick={() => navigate("/admin")}
+                sx={{ my: 2, color: "white", display: "block" }}
+              >
+                Admin Panel
+              </Button>
+            )}
           </Box>
           {!currentUser.isLoggedIn && (
             <Button color="inherit" onClick={() => navigate("/login")}>
               Login
             </Button>
           )}
+
           {currentUser.isLoggedIn && (
             <Box sx={{ flexGrow: 0 }}>
               <Tooltip title="Open settings">
                 <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                  <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />
+                  <Avatar alt="Sloth Avatar" src={sloth} />
                 </IconButton>
               </Tooltip>
               <Menu
@@ -121,11 +130,6 @@ export default function TopBar() {
                 onClose={handleCloseUserMenu}
               >
                 <MenuItem onClick={handleCloseUserMenu}>My Account</MenuItem>
-                {currentUser.admin && (
-                  <MenuItem onClick={() => navigate("/admin")}>
-                    Admin Panel
-                  </MenuItem>
-                )}
                 <MenuItem onClick={handleLogout}>Logout</MenuItem>
               </Menu>
             </Box>

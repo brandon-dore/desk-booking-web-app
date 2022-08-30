@@ -1,11 +1,11 @@
 import { Route, Routes, Navigate, useLocation, useNavigate } from "react-router-dom";
-import DeskBooking from "./desk-booking/DeskBooking";
+import DeskBooking from "./components/desk-booking/DeskBooking";
 import Home from "./Home";
-import { DeskBookingAdmin } from "./admin/DeskBookingAdmin";
-import { Login } from "./auth/Login";
-import { SignUp } from "./auth/SignUp";
+import { DeskBookingAdmin } from "./components/admin/DeskBookingAdmin";
+import { Login } from "./components/auth/Login";
+import { SignUp } from "./components/auth/SignUp";
 import { useEffect, useLayoutEffect } from "react";
-import AuthService from "./services/auth.service";
+import AuthService from "./components/services/auth.service";
 
 const App = () => {
   let location = useLocation();

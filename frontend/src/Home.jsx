@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import TopBar from "./auth/TopBar";
-import AuthService from "./services/auth.service";
+import TopBar from "./components/header/CommonAppBar";
+import AuthService from "./components/services/auth.service";
 import { Box } from "@mui/material";
 import { Link } from "react-router-dom";
 
