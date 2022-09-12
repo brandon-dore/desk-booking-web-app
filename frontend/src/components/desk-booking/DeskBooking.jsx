@@ -48,11 +48,6 @@ const DeskBooking = () => {
 
   let currentDesk = 0;
 
-  const locationIds = [
-    1, 11, 21, 31, 41, 2, 12, 22, 32, 42, 4, 14, 24, 34, 44, 5, 15, 25, 35, 45,
-    7, 17, 27, 37, 47, 8, 18, 28, 38, 48,
-  ];
-
   useEffect(() => {
     APIService.getUserInfo().then(
       (response) => {
@@ -195,77 +190,80 @@ const DeskBooking = () => {
         )}
         {desks && (
           <Box sx={{ m: 4, pt: 3, flexGrow: 1 }}>
-            <Box sx ={{mb:5}}>
-            <LocalizationProvider
-              dateAdapter={AdapterMoment}
-              sx={{ mb: 100 }}
-            >
-              <DesktopDatePicker
-                label="Date"
-                inputFormat="MM/DD/YYYY"
-                disablePast
-                value={currentDate}
-                onChange={(newDate) => {
-                  setCurrentDate(newDate);
-                }}
-                renderInput={(params) => <TextField {...params} />}
-                sx={{ mb: 1000 }}
-              />
-            </LocalizationProvider>
+            <Box sx={{ mb: 5 }}>
+              <LocalizationProvider
+                dateAdapter={AdapterMoment}
+                sx={{ mb: 100 }}
+              >
+                <DesktopDatePicker
+                  label="Date"
+                  inputFormat="MM/DD/YYYY"
+                  disablePast
+                  value={currentDate}
+                  onChange={(newDate) => {
+                    setCurrentDate(newDate);
+                  }}
+                  renderInput={(params) => <TextField {...params} />}
+                  sx={{ mb: 1000 }}
+                />
+              </LocalizationProvider>
             </Box>
-            <Grid
-              container
-              spacing={2}
+            <Box
               sx={{
-                "--Grid-borderWidth": "1px",
-                borderTop: "var(--Grid-borderWidth) solid",
-                borderLeft: "var(--Grid-borderWidth) solid",
-                borderColor: "divider",
-                "& > div": {
-                  borderRight: "var(--Grid-borderWidth) solid",
-                  borderBottom: "var(--Grid-borderWidth) solid",
-                  borderColor: "divider",
-                },
+                display: "grid",
+                gridAutoFlow: "column",
+                gridTemplateColumns: "repeat(8, 11.6vw)",
+                gridTemplateRows: "repeat(4, 11.6vw)",
+                gridTemplateAreas: "none",
               }}
             >
-              {[...Array(40)].map((_, index) => {
+              {[...Array(32)].map((_, index) => {
                 let isDesk = false;
+
                 let desk;
-                const deskLocation = locationIds[currentDesk] === index;
-                if (deskLocation === true && desks.length > currentDesk) {
-                  desk = desks[currentDesk];
-                  console.log(desk);
+                if (index + ((1 / 4) % 3) !== 0 && desks.length > currentDesk) {
                   isDesk = true;
-                  currentDesk = currentDesk + 1;
+                  desk = desks[currentDesk];
+                  currentDesk++;
                 }
 
-                console.log(locationIds[currentDesk]);
-
                 return (
-                  <Grid item xs={1.2} minHeight={250}>
-                    {isDesk && (
-                      <Item
+                  <>
+                    {isDesk ? (
+                      <Paper
                         sx={{
-                          "&:hover": desk.booked ? {} : { cursor: "pointer" },
-                          border: 1,
-                          borderColor: desk.booked ? "red" : "#fff",
-                          minHeight: 250,
-                          minWidth: 250,
+                          transition: "all 0.15s ease-out",
+                          "&:hover": desk.booked
+                            ? {}
+                            : {
+                                cursor: "pointer",
+                                transform: "scale(1.06)",
+                                transition: "all 0.15s ease-in",
+                              },
+                          border: 2,
+                          borderBottomStyle: "solid",
+                          borderColor: desk.booked ? "red" : "black",
+                          textAlign: "center",
+                          display: "flex",
+                          justifyContent: "center",
+                          alignItems: "center",
+                          fontSize: "1em",
+                          gridGap: "1px",
                         }}
                         onClick={() => handleOpen(desk)}
                       >
-                        {desk.number}{" "}
+                        {desk.number}
                         {desk.booked && (
-                          <>
-                            <br /> <p>Desk booked by {desk.booked_user}</p>
-                          </>
+                          <p>Desk booked by {desk.booked_user}</p>
                         )}
-                      </Item>
+                      </Paper>
+                    ) : (
+                      <Box> </Box>
                     )}
-                  </Grid>
+                  </>
                 );
               })}
-            </Grid>
+            </Box>
           </Box>
         )}
         <Modal
