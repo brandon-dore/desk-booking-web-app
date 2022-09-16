@@ -1,14 +1,22 @@
-import { Route, Routes, Navigate, useLocation } from "react-router-dom";
-import DeskBooking from "./desk-booking/DeskBooking";
-import Home from "./Home";
-import { DeskBookingAdmin } from "./admin/DeskBookingAdmin";
-import { Login } from "./auth/Login";
-import { SignUp } from "./auth/SignUp";
+import {
+  Route,
+  Routes,
+  Navigate,
+  useLocation,
+  useNavigate,
+} from "react-router-dom";
+import DeskBooking from "./components/desk-booking/DeskBooking";
+import Home from "./components/desk-booking/Home";
+import { DeskBookingAdmin } from "./components/admin/DeskBookingAdmin";
+import { Login } from "./components/auth/Login";
+import { SignUp } from "./components/auth/SignUp";
 import { useEffect, useLayoutEffect } from "react";
-import AuthService from "./services/auth.service";
+import AuthService from "./components/services/auth.service";
+import { NotFound } from './NotFound';
 
 const App = () => {
   let location = useLocation();
+  let navigate = useNavigate();
 
   useEffect(() => {
     const user = AuthService.getCurrentUser();
@@ -23,6 +31,8 @@ const App = () => {
       const decodedJwt = JSON.parse(atob(user.access_token.split(".")[1]));
       if (decodedJwt.exp * 1000 < Date.now()) {
         AuthService.logout();
+        navigate("/");
+        navigate(0);
       }
     }
   }, [location]);
@@ -48,15 +58,16 @@ const App = () => {
           </RequireAuth>
         }
       />
+      <Route path="*" element={<NotFound />} /> 
     </Routes>
   );
 };
 
 function RequireAuth({ children, redirectTo }) {
-  return localStorage.getItem("user").access_token == null ? (
+  return localStorage.getItem("user") !== null ? (
     children
   ) : (
-    <Navigate to={redirectTo} />
+    <Navigate to={redirectTo} replace={true}/>
   );
 }
 

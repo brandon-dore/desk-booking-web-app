@@ -2,17 +2,16 @@ import ast
 from fastapi import Depends, FastAPI, HTTPException, status, Response, Request, Query
 from fastapi.responses import RedirectResponse
 from sqlalchemy.orm import Session
-from datetime import timedelta, date
+from sqlalchemy import inspect
+import datetime
 from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
 
-from api import crud, models, schemas, auth
+from api import crud, security, schemas, auth
 from fastapi.security import OAuth2PasswordRequestForm
 from fastapi.middleware.cors import CORSMiddleware
 
 from api.database import SessionLocal, engine
-
-models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="Desk Booking API", swagger_ui_parameters={
               "operationsSorter": "method"})
@@ -57,9 +56,10 @@ def login_and_get_token(form_data: OAuth2PasswordRequestForm = Depends(), db: Se
             detail="Incorrect username or password",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    access_token_expires = timedelta(minutes=auth.ACCESS_TOKEN_EXPIRE_MINUTES)
-    refresh_token_expires = timedelta(
-        minutes=auth.REFRESH_TOKEN_EXPIRE_MINUTES)
+    access_token_expires = datetime.timedelta(
+        minutes=security.ACCESS_TOKEN_EXPIRE_MINUTES)
+    refresh_token_expires = datetime.timedelta(
+        minutes=security.REFRESH_TOKEN_EXPIRE_MINUTES)
 
     return {
         "access_token": auth.generic_token_creation(data={"sub": user.username}, expires_delta=access_token_expires, token_type="access"),
@@ -79,7 +79,8 @@ def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
 
 @app.get("/users", response_model=list[schemas.User])
 def read_users(response: Response, range: str = "[0,9]", sort: str = "['id', 'ASC']", db: Session = Depends(get_db)):
-    users = crud.get_users(db, range=ast.literal_eval(range), sort=ast.literal_eval(sort))
+    users = crud.get_users(db, range=ast.literal_eval(
+        range), sort=ast.literal_eval(sort))
     response.headers["Content-Range"] = str(len(users))
     response.headers['Access-Control-Expose-Headers'] = 'Content-Range'
     return users
@@ -91,6 +92,7 @@ def read_user(user_id: int, db: Session = Depends(get_db)):
     if db_user is None:
         raise HTTPException(status_code=404, detail="User not found")
     return db_user
+
 
 @app.get("/users/me/", response_model=schemas.User)
 def read_users_me(current_user: schemas.User = Depends(auth.get_current_active_user)):
@@ -127,7 +129,8 @@ def create_room(room: schemas.RoomCreate, db: Session = Depends(get_db)):
 
 @app.get("/rooms", response_model=list[schemas.Room])
 def read_rooms(response: Response, range: str = "[0,9]", sort: str = "['id', 'ASC']", db: Session = Depends(get_db)):
-    rooms = crud.get_rooms(db, range=ast.literal_eval(range), sort=ast.literal_eval(sort))
+    rooms = crud.get_rooms(db, range=ast.literal_eval(
+        range), sort=ast.literal_eval(sort))
     response.headers["Content-Range"] = str(len(rooms))
     response.headers['Access-Control-Expose-Headers'] = 'Content-Range'
     return rooms
@@ -172,9 +175,22 @@ def create_desk(desk: schemas.DeskCreate, db: Session = Depends(get_db)):
 
 @app.get("/desks", response_model=list[schemas.Desk])
 def read_desks(response: Response, range: str = "[0,9]", sort: str = "['id', 'ASC']", db: Session = Depends(get_db)):
-    desks = crud.get_desks(db, range=ast.literal_eval(range), sort=ast.literal_eval(sort))
+    desks = crud.get_desks(db, range=ast.literal_eval(
+        range), sort=ast.literal_eval(sort))
     response.headers["Content-Range"] = str(len(desks))
     response.headers['Access-Control-Expose-Headers'] = 'Content-Range'
+    return desks
+
+
+@app.get("/desks/{room_id}", response_model=list[schemas.Desk])
+def read_desks_in_room(response: Response, room_id: int, range: str = "[0,9]", sort: str = "['id', 'ASC']", db: Session = Depends(get_db)):
+    desks = crud.get_desks_in_room(
+        db, room_id=room_id, range=ast.literal_eval(
+            range), sort=ast.literal_eval(sort))
+    response.headers["Content-Range"] = str(len(desks))
+    response.headers['Access-Control-Expose-Headers'] = 'Content-Range'
+    if desks is None:
+        raise HTTPException(status_code=404, detail="Room not found")
     return desks
 
 
@@ -227,7 +243,8 @@ def create_booking(booking: schemas.BookingCreate, db: Session = Depends(get_db)
 
 @app.get("/bookings", response_model=list[schemas.Booking])
 def read_bookings(response: Response, range: str = "[0,9]", sort: str = "['id', 'ASC']", db: Session = Depends(get_db)):
-    bookings = crud.get_bookings(db, range=ast.literal_eval(range), sort=ast.literal_eval(sort))
+    bookings = crud.get_bookings(db, range=ast.literal_eval(
+        range), sort=ast.literal_eval(sort))
     response.headers["Content-Range"] = str(len(bookings))
     response.headers['Access-Control-Expose-Headers'] = 'Content-Range'
     return bookings
@@ -235,10 +252,12 @@ def read_bookings(response: Response, range: str = "[0,9]", sort: str = "['id', 
 
 @app.get("/bookings/summary", response_model=list[schemas.BookingSummary])
 def read_bookings_summary(response: Response, range: str = "[0,9]", sort: str = "['id', 'ASC']", db: Session = Depends(get_db)):
-    bookings = crud.get_bookings(db, range=ast.literal_eval(range), sort=ast.literal_eval(sort))
+    bookings = crud.get_bookings(db, range=ast.literal_eval(
+        range), sort=ast.literal_eval(sort))
     response.headers["Content-Range"] = str(len(bookings))
     response.headers['Access-Control-Expose-Headers'] = 'Content-Range'
     return bookings
+
 
 @app.get("/bookings/{booking_id}", response_model=schemas.Booking)
 def read_bookings(booking_id: int, response: Response, db: Session = Depends(get_db)):
@@ -258,22 +277,29 @@ def read_bookings_summary(booking_id: int, response: Response, db: Session = Dep
     return db_booking
 
 
-@app.get("/bookings/{date}/{user_id}", response_model=schemas.Booking)
-def read_booking(date: date, user_id: int, db: Session = Depends(get_db)):
-    db_booking = crud.get_booking(
-        db, date=date, user_id=user_id)
+# @app.get("/bookings/{date}/{user_id}", response_model=schemas.Booking)
+# def read_booking(date: datetime.date, user_id: int, db: Session = Depends(get_db)):
+#     db_booking = crud.get_booking(
+#         db, date=date, user_id=user_id)
+#     if db_booking is None:
+#         raise HTTPException(status_code=404, detail="Booking not found")
+#     return db_booking
+
+@app.get("/bookings/{date}/{room_id}", response_model=list[schemas.Booking])
+def read_bookings_by_room(response: Response, date: datetime.date, room_id: int, range: str = "[0,9]", sort: str = "['id', 'ASC']", db: Session = Depends(get_db)):
+    db_booking = crud.get_bookings_by_room(
+        db, date=date, room_id=room_id)
     if db_booking is None:
         raise HTTPException(status_code=404, detail="Booking not found")
     return db_booking
 
-
-@app.get("/bookings/{date}/{user_id}/summary", response_model=schemas.BookingSummary)
-def read_booking_summary(date: date, user_id: int, db: Session = Depends(get_db)):
-    db_booking = crud.get_booking(
-        db, date=date, user_id=user_id)
-    if db_booking is None:
-        raise HTTPException(status_code=404, detail="Booking not found")
-    return db_booking
+# @app.get("/bookings/{date}/{user_id}/summary", response_model=schemas.BookingSummary)
+# def read_booking_summary(date: datetime.date, user_id: int, db: Session = Depends(get_db)):
+#     db_booking = crud.get_booking(
+#         db, date=date, user_id=user_id)
+#     if db_booking is None:
+#         raise HTTPException(status_code=404, detail="Booking not found")
+#     return db_booking
 
 
 @app.patch("/bookings/{booking_id}")
