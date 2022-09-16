@@ -19,7 +19,6 @@ import { UserList, UserEdit, UserCreate } from "./users";
 import { RoomList, RoomEdit, RoomCreate } from "./rooms";
 import { BookingList, BookingEdit, BookingCreate } from "./bookings";
 import { DeskList, DeskEdit, DeskCreate } from "./desks";
-import MyAppBar from "../header/AdminAppBar";
 import Dashboard from "./Dashboard";
 import APIService from "../services/api.service";
 import TopBar from "../header/CommonAppBar";
@@ -46,7 +45,7 @@ export const dataProvider = {
     }).then(({ json }) => ({ data: json })),
 };
 
-const MyLayout = (props) => <Layout {...props} appBar={MyAppBar} />;
+const MyLayout = (props) => <Layout {...props} appBar={TopBar} />;
 
 export const DeskBookingAdmin = () => {
   const [isAdmin, setIsAdmin] = useState(undefined);
@@ -67,7 +66,7 @@ export const DeskBookingAdmin = () => {
     <>
       {!isAdmin && (
         <>
-          <TopBar />{" "}
+          <TopBar />
           <Container component="main" maxWidth="xs">
             <CssBaseline />
             <Box

@@ -45,7 +45,6 @@ const DeskBooking = () => {
   const [desks, setDesks] = useState(undefined);
   const [bookings, setBookings] = useState(undefined);
   const [modalOpen, setModalOpen] = useState(false);
-  const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const [openedDesk, setOpenedDesk] = useState({
@@ -186,7 +185,7 @@ const DeskBooking = () => {
 
   return (
     <>
-      <TopBar />
+      <TopBar commonAppBar />
       <Box sx={{ mx: 5 }}>
         {rooms ? (
           <Box sx={{ m: 1, pt: 1, flexGrow: 1 }}>
