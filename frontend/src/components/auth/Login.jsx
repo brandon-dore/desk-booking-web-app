@@ -9,7 +9,6 @@ import {
   Typography,
 } from "@mui/material";
 import LoadingButton from "@mui/lab/LoadingButton";
-
 import TopBar from "../header/CommonAppBar";
 import AuthService from "../services/auth.service";
 import { useForm } from "react-hook-form";
@@ -17,10 +16,10 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import * as Yup from "yup";
 
 export const Login = () => {
+  let navigate = useNavigate();
+
   const [loading, setLoading] = useState(false);
   const [response, setResponse] = useState(undefined);
-
-  let navigate = useNavigate();
 
   const validationSchema = Yup.object().shape({
     username: Yup.string().required("Username is required"),

@@ -12,6 +12,8 @@ import {
   Typography,
   TextField,
 } from "@mui/material";
+import LoadingButton from "@mui/lab/LoadingButton";
+import { useSnackbar } from "notistack";
 import { LocalizationProvider, DesktopDatePicker } from "@mui/x-date-pickers";
 import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment";
 import moment from "moment";
@@ -36,12 +38,20 @@ const style = {
 };
 
 const DeskBooking = () => {
+  const { enqueueSnackbar, closeSnackbar } = useSnackbar();
+
   const [user, setUser] = useState(undefined);
   const [rooms, setRooms] = useState(undefined);
   const [desks, setDesks] = useState(undefined);
   const [bookings, setBookings] = useState(undefined);
-  const [open, setOpen] = useState(false);
-  const [openedDesk, setOpenedDesk] = useState(undefined);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  const [openedDesk, setOpenedDesk] = useState({
+    id: undefined,
+    number: undefined,
+  });
 
   const [currentRoom, setCurrentRoom] = useState(undefined);
   const [currentDate, setCurrentDate] = useState(moment());
@@ -79,13 +89,13 @@ const DeskBooking = () => {
     }
   }, [currentDate]);
 
-  const handleOpen = (desk) => {
+  const handleModalOpen = (desk) => {
     if (!desk.booked) {
-      setOpen(true);
-      setOpenedDesk(desk.id);
+      setModalOpen(true);
+      setOpenedDesk({ id: desk.id, number: desk.number });
     }
   };
-  const handleClose = () => setOpen(false);
+  const handleModalClose = () => setModalOpen(false);
 
   const getDesks = () => {
     APIService.getDesks(currentRoom).then(
@@ -147,18 +157,29 @@ const DeskBooking = () => {
   };
 
   const bookDesk = () => {
+    setLoading(true);
     APIService.makeBooking({
       date: currentDate.format("YYYY-MM-DD"),
       user_id: user.id,
-      desk_id: openedDesk,
+      desk_id: openedDesk.id,
       approved_status: false,
     }).then(
       () => {
-        handleClose();
+        handleModalClose();
         getBookings();
+        enqueueSnackbar("Desk booked successfully", {
+          variant: "success",
+        });
+        setLoading(false);
       },
       () => {
-        console.log("error");
+        enqueueSnackbar(
+          "Error occured while booking desk. Please try again later",
+          {
+            variant: "error",
+          }
+        );
+        setLoading(false);
       }
     );
   };
@@ -180,7 +201,7 @@ const DeskBooking = () => {
                     setCurrentRoom(e.currentTarget.getAttribute("room-id"));
                   }}
                 >
-                  Room: {room.name}
+                  {room.name}
                 </Button>
               ))}
             </Stack>
@@ -215,60 +236,59 @@ const DeskBooking = () => {
                 gridTemplateColumns: "repeat(8, 11.6vw)",
                 gridTemplateRows: "repeat(4, 11.6vw)",
                 gridTemplateAreas: "none",
+                gap: "3px"
               }}
             >
               {[...Array(32)].map((_, index) => {
-                let isDesk = false;
-
+                let seperate = [8, 9, 10, 11, 20, 21, 22, 23];
                 let desk;
-                if (index + ((1 / 4) % 3) !== 0 && desks.length > currentDesk) {
-                  isDesk = true;
-                  desk = desks[currentDesk];
+                if (seperate.includes(index) && desks.length > currentDesk) {
+                  return <Box></Box>;
+                } else if (desks.length > currentDesk + 1) {
                   currentDesk++;
+                  desk = desks[currentDesk];
+                  return (
+                    <Paper
+                      sx={{
+                        transition: "all 0.13s ease-out",
+                        "&:hover": desk.booked
+                          ? {}
+                          : {
+                              cursor: "pointer",
+                              transform: "scale(1.06)",
+                              transition: "all 0.13s ease-in",
+                            },
+                        border: 2,
+                        borderBottomStyle: "solid",
+                        backgroundColor: desk.booked ? "rgba(255, 0, 0, 0.75)" : "white",
+                        textAlign: "center",
+                        display: "flex",
+                        flexDirection: "column",
+                        gap: "10px",
+                        justifyContent: "center",
+                        alignItems: "center",
+                        gridGap: "1px",
+                      }}
+                      onClick={() => handleModalOpen(desk)}
+                    >
+                      <Typography style={{ minWidth: "100%", fontWeight: 700, fontSize: "1.5em" }}>
+                        Desk {desk.number}
+                      </Typography>
+                      {desk.booked && (
+                        <Typography>
+                          Desk booked by {desk.booked_user}
+                        </Typography>
+                      )}
+                    </Paper>
+                  );
                 }
-
-                return (
-                  <>
-                    {isDesk ? (
-                      <Paper
-                        sx={{
-                          transition: "all 0.15s ease-out",
-                          "&:hover": desk.booked
-                            ? {}
-                            : {
-                                cursor: "pointer",
-                                transform: "scale(1.06)",
-                                transition: "all 0.15s ease-in",
-                              },
-                          border: 2,
-                          borderBottomStyle: "solid",
-                          borderColor: desk.booked ? "red" : "black",
-                          textAlign: "center",
-                          display: "flex",
-                          justifyContent: "center",
-                          alignItems: "center",
-                          fontSize: "1em",
-                          gridGap: "1px",
-                        }}
-                        onClick={() => handleOpen(desk)}
-                      >
-                        {desk.number}
-                        {desk.booked && (
-                          <p>Desk booked by {desk.booked_user}</p>
-                        )}
-                      </Paper>
-                    ) : (
-                      <Box> </Box>
-                    )}
-                  </>
-                );
               })}
             </Box>
           </Box>
         )}
         <Modal
-          open={open}
-          onClose={handleClose}
+          open={modalOpen}
+          onClose={handleModalClose}
           aria-labelledby="modal-modal-title"
           aria-describedby="modal-modal-description"
         >
@@ -278,12 +298,17 @@ const DeskBooking = () => {
             </Typography>
             <Typography id="modal-modal-description" sx={{ mt: 2 }}>
               By clicking the button below, you are confirming that you will sit
-              at this desk on {currentDate && currentDate.format("YYYY-MM-DD")}
+              at desk {openedDesk.number} on{" "}
+              {currentDate && currentDate.format("YYYY-MM-DD")}
             </Typography>
             <br />
-            <Button variant="contained" onClick={bookDesk}>
+            <LoadingButton
+              variant="contained"
+              loading={loading}
+              onClick={bookDesk}
+            >
               Book Desk
-            </Button>
+            </LoadingButton>
           </Box>
         </Modal>
       </Box>

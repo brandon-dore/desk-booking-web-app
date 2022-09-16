@@ -5,7 +5,7 @@ from sqlalchemy.orm.exc import NoResultFound
 
 import datetime
 
-from api import models, schemas, auth
+from api import models, schemas, security
 
 from datetime import datetime
 
@@ -26,7 +26,7 @@ def get_users(db: Session, range: list[int] = [0, 9], sort: list[str] = ["id", "
 
 def create_user(db: Session, user: schemas.UserCreate):
     db_user = models.User(
-        email=user.email, username=user.username, hashed_password=auth.get_hashed_password(user.password), admin=user.admin)
+        email=user.email, username=user.username, hashed_password=security.get_hashed_password(user.password), admin=user.admin)
     db.add(db_user)
     db.commit()
     db.refresh(db_user)
@@ -97,7 +97,8 @@ def get_desks(db: Session, range: list[int] = [0, 9], sort: list[str] = ["id", "
     return db.query(models.Desk).order_by(desks_order).offset(range[0]).limit(range[1]).all()
 
 
-def get_desks_in_room(db: Session, room_id: int , range: list[int] = [0, 9], sort: list[str] = ["id", "ASC"]):
+def get_desks_in_room(db: Session, room_id: int, range: list[int] = [0, 9], sort: list[str] = ["id", "ASC"]):
+    print(range)
     desks_order = getattr(models.Desk, sort[0]).asc() if sort[1].upper(
     ) == "ASC" else getattr(models.Desk, sort[0]).desc()
     return db.query(models.Desk).filter(models.Desk.room_id == room_id).order_by(desks_order).offset(range[0]).limit(range[1]).all()
@@ -145,8 +146,8 @@ def get_bookings(db: Session, range: list[int] = [0, 9], sort: list[str] = ["id"
 
 def get_bookings_by_room(db: Session, room_id: int, date: datetime.date):
     try:
-        print("HERE")
-        print(str(db.query(models.Booking).join(models.Desk).filter(and_(models.Desk.room_id == room_id, models.Booking.date == date.isoformat())).all()))
+        print(str(db.query(models.Booking).join(models.Desk).filter(and_(
+            models.Desk.room_id == room_id, models.Booking.date == date.isoformat())).all()))
         return db.query(models.Booking).join(models.Desk).filter(and_(models.Desk.room_id == room_id, models.Booking.date == date.isoformat())).all()
     except NoResultFound:
         return None

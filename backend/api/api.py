@@ -2,17 +2,16 @@ import ast
 from fastapi import Depends, FastAPI, HTTPException, status, Response, Request, Query
 from fastapi.responses import RedirectResponse
 from sqlalchemy.orm import Session
+from sqlalchemy import inspect
 import datetime
 from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
 
-from api import crud, models, schemas, auth
+from api import crud, security, schemas, auth
 from fastapi.security import OAuth2PasswordRequestForm
 from fastapi.middleware.cors import CORSMiddleware
 
 from api.database import SessionLocal, engine
-
-models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="Desk Booking API", swagger_ui_parameters={
               "operationsSorter": "method"})
@@ -58,9 +57,9 @@ def login_and_get_token(form_data: OAuth2PasswordRequestForm = Depends(), db: Se
             headers={"WWW-Authenticate": "Bearer"},
         )
     access_token_expires = datetime.timedelta(
-        minutes=auth.ACCESS_TOKEN_EXPIRE_MINUTES)
+        minutes=security.ACCESS_TOKEN_EXPIRE_MINUTES)
     refresh_token_expires = datetime.timedelta(
-        minutes=auth.REFRESH_TOKEN_EXPIRE_MINUTES)
+        minutes=security.REFRESH_TOKEN_EXPIRE_MINUTES)
 
     return {
         "access_token": auth.generic_token_creation(data={"sub": user.username}, expires_delta=access_token_expires, token_type="access"),
@@ -184,9 +183,12 @@ def read_desks(response: Response, range: str = "[0,9]", sort: str = "['id', 'AS
 
 
 @app.get("/desks/{room_id}", response_model=list[schemas.Desk])
-def read_desks_in_room(room_id: int, db: Session = Depends(get_db)):
+def read_desks_in_room(response: Response, room_id: int, range: str = "[0,9]", sort: str = "['id', 'ASC']", db: Session = Depends(get_db)):
     desks = crud.get_desks_in_room(
-        db, room_id=room_id)
+        db, room_id=room_id, range=ast.literal_eval(
+            range), sort=ast.literal_eval(sort))
+    response.headers["Content-Range"] = str(len(desks))
+    response.headers['Access-Control-Expose-Headers'] = 'Content-Range'
     if desks is None:
         raise HTTPException(status_code=404, detail="Room not found")
     return desks
