@@ -93,7 +93,7 @@ def login_and_get_token(form_data: OAuth2PasswordRequestForm = Depends(), db: Se
         "token_type": "bearer"
     }
 
-
+# Registers both endpoints to keep to REST standards
 @app.post("/register", response_model=schemas.User)
 @app.post("/users", response_model=schemas.User)
 def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
@@ -121,7 +121,7 @@ def read_user(user_id: int, db: Session = Depends(get_db)):
 
 
 @app.get("/users/me/", response_model=schemas.User)
-def read_users_me(current_user: schemas.User = Depends(auth.get_current_active_user)):
+def read_own_details(current_user: schemas.User = Depends(auth.get_current_active_user)):
     print(current_user)
     return current_user
 
@@ -206,7 +206,7 @@ def read_desks(response: Response, range: Union[list[int], None] = Query(default
     return desks
 
 
-@app.get("/desks/{room_id}", response_model=list[schemas.Desk])
+@app.get("/rooms/{room_id}/desks", response_model=list[schemas.Desk])
 def read_desks_in_room(response: Response, room_id: int, range: Union[list[int], None] = Query(default=None), sort: Union[list[str], None] = Query(default=['id', 'ASC']), db: Session = Depends(get_db)):
     desks = crud.get_desks_in_room(
         db, room_id=room_id, range=range, sort=sort)
@@ -271,7 +271,7 @@ def read_bookings(booking_id: int, response: Response, db: Session = Depends(get
     return db_booking
 
 
-@app.get("/bookings/{date}/{room_id}", response_model=list[schemas.Booking])
+@app.get("/rooms/{room_id}/bookings/{date}", response_model=list[schemas.Booking])
 def read_bookings_by_room(response: Response, date: datetime.date, room_id: int, range: Union[list[int], None] = Query(default=None), sort: Union[list[str], None] = Query(default=['id', 'ASC']), db: Session = Depends(get_db)):
     db_booking = crud.get_bookings_by_room(
         db, date=date, room_id=room_id)
@@ -296,3 +296,7 @@ def delete_booking(booking_id: int, db: Session = Depends(get_db)):
     if booking_to_delete is None:
         raise HTTPException(status_code=404, detail="Booking not found")
     crud.delete_booking(db, booking_id=booking_id)
+    
+@app.get("/users/me/bookings/")
+async def read_own_items(current_user: schemas.User = Depends(auth.get_current_active_user), db: Session = Depends(get_db)):
+    return crud.get_users_bookings(db=db, user_id=current_user.id)

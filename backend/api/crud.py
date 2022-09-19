@@ -208,3 +208,6 @@ def update_booking(db: Session, booking: models.Booking, updates: schemas.Bookin
 def delete_booking(db: Session, booking_id: int):
     db.query(models.Booking).filter(models.Booking.id == booking_id).delete()
     db.commit()
+
+def get_users_bookings(db: Session, user_id: int):
+    return db.query(models.Booking).filter(models.Booking.user_id == user_id).all()
