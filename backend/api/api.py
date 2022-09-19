@@ -295,6 +295,6 @@ def delete_booking(booking_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Booking not found")
     crud.delete_booking(db, booking_id=booking_id)
     
-@app.get("/users/me/bookings/")
+@app.get("/users/me/bookings/", response_model=list[schemas.BookingSummary])
 async def read_own_items(current_user: schemas.User = Depends(auth.get_current_active_user), db: Session = Depends(get_db)):
     return crud.get_users_bookings(db=db, user_id=current_user.id)

@@ -141,6 +141,14 @@ export default function CommonAppBar(props) {
               Book a Desk
             </Button>
           )}
+          {currentUser.isLoggedIn && (
+            <Button
+              onClick={() => navigate("/my-bookings")}
+              sx={{ my: 2, color: "white", display: "block" }}
+            >
+              My Bookings
+            </Button>
+          )}
           {currentUser.admin && (
             <Button
               onClick={() => navigate("/admin")}

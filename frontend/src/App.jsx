@@ -6,6 +6,7 @@ import {
   useNavigate,
 } from "react-router-dom";
 import DeskBooking from "./components/desk-booking/DeskBooking";
+import UserBookings from "./components/desk-booking/UserBookings";
 import Home from "./components/desk-booking/Home";
 import { DeskBookingAdmin } from "./components/admin/DeskBookingAdmin";
 import { Login } from "./components/auth/Login";
@@ -52,6 +53,14 @@ const App = () => {
         element={
           <RequireAuth redirectTo="/">
             <DeskBooking />
+          </RequireAuth>
+        }
+      />
+      <Route
+        path="/my-bookings"
+        element={
+          <RequireAuth redirectTo="/">
+            <UserBookings />
           </RequireAuth>
         }
       />

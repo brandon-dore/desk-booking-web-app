@@ -67,7 +67,6 @@ class Desk(DeskBase):
     class Config:
         orm_mode = True
 
-
 class DeskUpdate(BaseModel):
     number: Union[int, None] = None
     room_id: Union[int, None] = None

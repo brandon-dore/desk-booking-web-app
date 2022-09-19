@@ -63,7 +63,9 @@ const DeskBooking = () => {
         setUser(response.data);
       },
       (error) => {
-        console.log(error);
+        enqueueSnackbar("Unable to retrive user info", {
+          variant: "error",
+        });
       }
     );
     APIService.getRooms().then(
@@ -71,7 +73,9 @@ const DeskBooking = () => {
         setRooms(response.data);
       },
       (error) => {
-        console.log(error);
+        enqueueSnackbar("Unable to retrive rooms", {
+          variant: "error",
+        });
       }
     );
   }, []);

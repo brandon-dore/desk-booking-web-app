@@ -205,4 +205,5 @@ def delete_booking(db: Session, booking_id: int):
 
 
 def get_users_bookings(db: Session, user_id: int):
-    return db.query(models.Booking).filter(models.Booking.user_id == user_id).all()
+    bookings_order = getattr(models.Booking, 'date').desc()
+    return db.query(models.Booking).filter(models.Booking.user_id == user_id).order_by(bookings_order).all()
