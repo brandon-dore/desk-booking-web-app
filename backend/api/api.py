@@ -225,16 +225,6 @@ def read_desk(desk_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Desk not found")
     return db_desk
 
-
-@app.get("/desks/{room_id}/{desk_number}", response_model=schemas.Desk)
-def read_desk(room_id: int, desk_number: int, db: Session = Depends(get_db)):
-    db_desk = crud.get_desk_by_room_and_number(
-        db, room_id=room_id, desk_number=desk_number)
-    if db_desk is None:
-        raise HTTPException(status_code=404, detail="Desk not found")
-    return db_desk
-
-
 @app.patch("/desks/{desk_id}")
 def update_desk(desk_id: int, desk: schemas.DeskUpdate, db: Session = Depends(get_db)):
     existing_desk = crud.get_desk(db, desk_id=desk_id)
@@ -272,14 +262,6 @@ def read_bookings(response: Response, range: Union[list[int], None] = Query(defa
     return bookings
 
 
-@app.get("/bookings/summary", response_model=list[schemas.BookingSummary])
-def read_bookings_summary(response: Response, range: Union[list[int], None] = Query(default=None), sort: Union[list[str], None] = Query(default=['id', 'ASC']), db: Session = Depends(get_db)):
-    bookings = crud.get_bookings(db, range=range, sort=sort)
-    response.headers["Content-Range"] = str(len(bookings))
-    response.headers['Access-Control-Expose-Headers'] = 'Content-Range'
-    return bookings
-
-
 @app.get("/bookings/{booking_id}", response_model=schemas.Booking)
 def read_bookings(booking_id: int, response: Response, db: Session = Depends(get_db)):
     db_booking = crud.get_booking(
@@ -289,23 +271,6 @@ def read_bookings(booking_id: int, response: Response, db: Session = Depends(get
     return db_booking
 
 
-@app.get("/bookings/{booking_id}/summary", response_model=schemas.BookingSummary)
-def read_bookings_summary(booking_id: int, response: Response, db: Session = Depends(get_db)):
-    db_booking = crud.get_booking(
-        db, booking_id=booking_id)
-    if db_booking is None:
-        raise HTTPException(status_code=404, detail="Desk not found")
-    return db_booking
-
-
-# @app.get("/bookings/{date}/{user_id}", response_model=schemas.Booking)
-# def read_booking(date: datetime.date, user_id: int, db: Session = Depends(get_db)):
-#     db_booking = crud.get_booking(
-#         db, date=date, user_id=user_id)
-#     if db_booking is None:
-#         raise HTTPException(status_code=404, detail="Booking not found")
-#     return db_booking
-
 @app.get("/bookings/{date}/{room_id}", response_model=list[schemas.Booking])
 def read_bookings_by_room(response: Response, date: datetime.date, room_id: int, range: Union[list[int], None] = Query(default=None), sort: Union[list[str], None] = Query(default=['id', 'ASC']), db: Session = Depends(get_db)):
     db_booking = crud.get_bookings_by_room(
@@ -313,14 +278,6 @@ def read_bookings_by_room(response: Response, date: datetime.date, room_id: int,
     if db_booking is None:
         raise HTTPException(status_code=404, detail="Booking not found")
     return db_booking
-
-# @app.get("/bookings/{date}/{user_id}/summary", response_model=schemas.BookingSummary)
-# def read_booking_summary(date: datetime.date, user_id: int, db: Session = Depends(get_db)):
-#     db_booking = crud.get_booking(
-#         db, date=date, user_id=user_id)
-#     if db_booking is None:
-#         raise HTTPException(status_code=404, detail="Booking not found")
-#     return db_booking
 
 
 @app.patch("/bookings/{booking_id}")
