@@ -259,7 +259,7 @@ const DeskBooking = () => {
                             },
                         border: 2,
                         borderBottomStyle: "solid",
-                        backgroundColor: desk.booked ? "rgba(255, 0, 0, 0.75)" : "white",
+                        backgroundColor: desk.booked ? "rgba(128,128,128, 0.75)" : "white",
                         textAlign: "center",
                         display: "flex",
                         flexDirection: "column",
