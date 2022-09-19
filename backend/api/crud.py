@@ -1,3 +1,4 @@
+from typing import Optional, Union
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
 from sqlalchemy import and_
@@ -18,10 +19,16 @@ def get_user_by_username(db: Session, username: str):
     return db.query(models.User).filter(models.User.username == username).first()
 
 
-def get_users(db: Session, range: list[int] = [0, 9], sort: list[str] = ["id", "ASC"]):
-    users_id = getattr(models.User, sort[0]).asc() if sort[1].upper(
-    ) == "ASC" else getattr(models.User, sort[0]).desc()
-    return db.query(models.User).order_by(users_id).offset(range[0]).limit(range[1]).all()
+def get_users(db: Session, range: Union[list[int], None], sort: Union[list[str], None]):
+    if sort == None:
+        users_id = getattr(models.User, 'id').asc()
+    else:
+        users_id = getattr(models.User, sort[0]).asc() if sort[1].upper(
+        ) == "ASC" else getattr(models.User, sort[0]).desc()
+    if range == None:
+        return db.query(models.User).order_by(users_id).all()
+    else:
+        return db.query(models.User).order_by(users_id).offset(range[0]).limit(range[1]).all()
 
 
 def create_user(db: Session, user: schemas.UserCreate):
@@ -55,10 +62,16 @@ def get_room_by_name(db: Session, room_name: str):
     return db.query(models.Room).filter(models.Room.name == room_name).first()
 
 
-def get_rooms(db: Session, range: list[int] = [0, 9], sort: list[str] = ["id", "ASC"]):
-    rooms_id = getattr(models.Room, sort[0]).asc() if sort[1].upper(
-    ) == "ASC" else getattr(models.Room, sort[0]).desc()
-    return db.query(models.Room).order_by(rooms_id).offset(range[0]).limit(range[1]).all()
+def get_rooms(db: Session, range: Union[list[int], None], sort: Union[list[str], None]):
+    if sort == None:
+        rooms_id = getattr(models.Room, 'id').asc()
+    else:
+        rooms_id = getattr(models.Room, sort[0]).asc() if sort[1].upper(
+            ) == "ASC" else getattr(models.Room, sort[0]).desc()
+    if range == None:
+        return db.query(models.Room).order_by(rooms_id).all()
+    else:
+        return db.query(models.Room).order_by(rooms_id).offset(range[0]).limit(range[1]).all()
 
 
 def create_room(db: Session, room: schemas.RoomCreate):
@@ -91,17 +104,32 @@ def get_desk_by_room_and_number(db: Session, desk_number: int, room_id: int):
     return db.query(models.Desk).filter(and_(models.Desk.room_id == room_id, models.Desk.number == desk_number)).first()
 
 
-def get_desks(db: Session, range: list[int] = [0, 9], sort: list[str] = ["id", "ASC"]):
-    desks_order = getattr(models.Desk, sort[0]).asc() if sort[1].upper(
-    ) == "ASC" else getattr(models.Desk, sort[0]).desc()
-    return db.query(models.Desk).order_by(desks_order).offset(range[0]).limit(range[1]).all()
+def get_desks(db: Session, range: Union[list[int], None], sort: Union[list[str], None]):
+    if sort == None:
+           desks_order = getattr(models.Desk, 'id').asc()
+    else:
+        desks_order = getattr(models.Desk, sort[0]).asc() if sort[1].upper(
+        ) == "ASC" else getattr(models.Desk, sort[0]).desc()
+    if range == None:
+        return db.query(models.Desk).order_by(desks_order).all()
+    else:
+        return db.query(models.Desk).order_by(desks_order).offset(range[0]).limit(range[1]).all()
 
 
-def get_desks_in_room(db: Session, room_id: int, range: list[int] = [0, 9], sort: list[str] = ["id", "ASC"]):
-    print(range)
-    desks_order = getattr(models.Desk, sort[0]).asc() if sort[1].upper(
-    ) == "ASC" else getattr(models.Desk, sort[0]).desc()
-    return db.query(models.Desk).filter(models.Desk.room_id == room_id).order_by(desks_order).offset(range[0]).limit(range[1]).all()
+def get_desks_in_room(db: Session, room_id: int, range: Union[list[int], None], sort: Union[list[str], None]):
+    if sort == None:
+           desks_order = getattr(models.Desk, 'id').asc()
+    else:
+        desks_order = getattr(models.Desk, sort[0]).asc() if sort[1].upper(
+        ) == "ASC" else getattr(models.Desk, sort[0]).desc()
+    if range == None:
+        return db.query(models.Desk).filter(models.Desk.room_id == room_id).order_by(desks_order).all()
+    else:
+        return db.query(models.Desk).filter(models.Desk.room_id == room_id).order_by(desks_order).offset(range[0]).limit(range[1]).all()
+
+    
+    
+
 
 
 def create_desk(db: Session, desk: schemas.DeskCreate):
@@ -138,10 +166,16 @@ def get_booking_by_desk_and_date(db: Session, desk_id: int, date: datetime.date)
         return None
 
 
-def get_bookings(db: Session, range: list[int] = [0, 9], sort: list[str] = ["id", "ASC"]):
-    bookings_id = getattr(models.Booking, sort[0]).asc() if sort[1].upper(
-    ) == "ASC" else getattr(models.Booking, sort[0]).desc()
-    return db.query(models.Booking).order_by(bookings_id).offset(range[0]).limit(range[1]).all()
+def get_bookings(db: Session, range: Union[list[int], None], sort: Union[list[str], None]):
+    if sort == None:
+        bookings_id = getattr(models.Booking, 'id').asc()
+    else:
+        bookings_id = getattr(models.Booking, sort[0]).asc() if sort[1].upper(
+        ) == "ASC" else getattr(models.Booking, sort[0]).desc()
+    if range == None:
+        return db.query(models.Booking).order_by(bookings_id).all()
+    else:
+        return db.query(models.Booking).order_by(bookings_id).offset(range[0]).limit(range[1]).all()
 
 
 def get_bookings_by_room(db: Session, room_id: int, date: datetime.date):

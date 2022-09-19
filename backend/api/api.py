@@ -1,4 +1,6 @@
 import ast
+from typing import Optional, Union
+from urllib.parse import urlencode
 from fastapi import Depends, FastAPI, HTTPException, status, Response, Request, Query
 from fastapi.responses import RedirectResponse
 from sqlalchemy.orm import Session
@@ -36,6 +38,30 @@ def get_db():
         yield db
     finally:
         db.close()
+
+# Middleware to convert query strings
+# Request gets changed from: http://localhost:8000/users?&range=[0,9]&sort=["id","ASC"]
+# to:                        http://localhost:8000/users?&range=0&range=9&sort=id&sort=ASC
+
+
+@app.middleware("http")
+def flatten_query_string_lists(request: Request, call_next):
+
+    flattened = []
+
+    for key, value in request.query_params.multi_items():
+        value = value.strip("[]")
+        for entry in value.split(','):
+            entry = entry.strip('""')
+            if entry.isdigit():
+                flattened.append((key, int(entry)))
+            else:
+                flattened.append((key, entry))
+
+    request.scope["query_string"] = urlencode(
+        flattened, doseq=True).encode("utf-8")
+
+    return call_next(request)
 
 # Redirect to docs
 
@@ -78,9 +104,9 @@ def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
 
 
 @app.get("/users", response_model=list[schemas.User])
-def read_users(response: Response, range: str = "[0,9]", sort: str = "['id', 'ASC']", db: Session = Depends(get_db)):
-    users = crud.get_users(db, range=ast.literal_eval(
-        range), sort=ast.literal_eval(sort))
+def read_users(response: Response, range: Union[list[int], None] = Query(default=None), sort: Union[list[str], None] = Query(default=['id', 'ASC']), db: Session = Depends(get_db)):
+    print(range)
+    users = crud.get_users(db, range=range, sort=sort)
     response.headers["Content-Range"] = str(len(users))
     response.headers['Access-Control-Expose-Headers'] = 'Content-Range'
     return users
@@ -128,9 +154,8 @@ def create_room(room: schemas.RoomCreate, db: Session = Depends(get_db)):
 
 
 @app.get("/rooms", response_model=list[schemas.Room])
-def read_rooms(response: Response, range: str = "[0,9]", sort: str = "['id', 'ASC']", db: Session = Depends(get_db)):
-    rooms = crud.get_rooms(db, range=ast.literal_eval(
-        range), sort=ast.literal_eval(sort))
+def read_rooms(response: Response, range: Union[list[int], None] = Query(default=None), sort: Union[list[str], None] = Query(default=['id', 'ASC']), db: Session = Depends(get_db)):
+    rooms = crud.get_rooms(db, range=range, sort=sort)
     response.headers["Content-Range"] = str(len(rooms))
     response.headers['Access-Control-Expose-Headers'] = 'Content-Range'
     return rooms
@@ -174,19 +199,17 @@ def create_desk(desk: schemas.DeskCreate, db: Session = Depends(get_db)):
 
 
 @app.get("/desks", response_model=list[schemas.Desk])
-def read_desks(response: Response, range: str = "[0,9]", sort: str = "['id', 'ASC']", db: Session = Depends(get_db)):
-    desks = crud.get_desks(db, range=ast.literal_eval(
-        range), sort=ast.literal_eval(sort))
+def read_desks(response: Response, range: Union[list[int], None] = Query(default=None), sort: Union[list[str], None] = Query(default=None), db: Session = Depends(get_db)):
+    desks = crud.get_desks(db, range=range, sort=sort)
     response.headers["Content-Range"] = str(len(desks))
     response.headers['Access-Control-Expose-Headers'] = 'Content-Range'
     return desks
 
 
 @app.get("/desks/{room_id}", response_model=list[schemas.Desk])
-def read_desks_in_room(response: Response, room_id: int, range: str = "[0,9]", sort: str = "['id', 'ASC']", db: Session = Depends(get_db)):
+def read_desks_in_room(response: Response, room_id: int, range: Union[list[int], None] = Query(default=None), sort: Union[list[str], None] = Query(default=['id', 'ASC']), db: Session = Depends(get_db)):
     desks = crud.get_desks_in_room(
-        db, room_id=room_id, range=ast.literal_eval(
-            range), sort=ast.literal_eval(sort))
+        db, room_id=room_id, range=range, sort=sort)
     response.headers["Content-Range"] = str(len(desks))
     response.headers['Access-Control-Expose-Headers'] = 'Content-Range'
     if desks is None:
@@ -242,18 +265,16 @@ def create_booking(booking: schemas.BookingCreate, db: Session = Depends(get_db)
 
 
 @app.get("/bookings", response_model=list[schemas.Booking])
-def read_bookings(response: Response, range: str = "[0,9]", sort: str = "['id', 'ASC']", db: Session = Depends(get_db)):
-    bookings = crud.get_bookings(db, range=ast.literal_eval(
-        range), sort=ast.literal_eval(sort))
+def read_bookings(response: Response, range: Union[list[int], None] = Query(default=None), sort: Union[list[str], None] = Query(default=['id', 'ASC']), db: Session = Depends(get_db)):
+    bookings = crud.get_bookings(db, range=range, sort=sort)
     response.headers["Content-Range"] = str(len(bookings))
     response.headers['Access-Control-Expose-Headers'] = 'Content-Range'
     return bookings
 
 
 @app.get("/bookings/summary", response_model=list[schemas.BookingSummary])
-def read_bookings_summary(response: Response, range: str = "[0,9]", sort: str = "['id', 'ASC']", db: Session = Depends(get_db)):
-    bookings = crud.get_bookings(db, range=ast.literal_eval(
-        range), sort=ast.literal_eval(sort))
+def read_bookings_summary(response: Response, range: Union[list[int], None] = Query(default=None), sort: Union[list[str], None] = Query(default=['id', 'ASC']), db: Session = Depends(get_db)):
+    bookings = crud.get_bookings(db, range=range, sort=sort)
     response.headers["Content-Range"] = str(len(bookings))
     response.headers['Access-Control-Expose-Headers'] = 'Content-Range'
     return bookings
@@ -286,7 +307,7 @@ def read_bookings_summary(booking_id: int, response: Response, db: Session = Dep
 #     return db_booking
 
 @app.get("/bookings/{date}/{room_id}", response_model=list[schemas.Booking])
-def read_bookings_by_room(response: Response, date: datetime.date, room_id: int, range: str = "[0,9]", sort: str = "['id', 'ASC']", db: Session = Depends(get_db)):
+def read_bookings_by_room(response: Response, date: datetime.date, room_id: int, range: Union[list[int], None] = Query(default=None), sort: Union[list[str], None] = Query(default=['id', 'ASC']), db: Session = Depends(get_db)):
     db_booking = crud.get_bookings_by_room(
         db, date=date, room_id=room_id)
     if db_booking is None:
