@@ -20,9 +20,6 @@ const App = () => {
 
   useEffect(() => {
     const user = AuthService.getCurrentUser();
-    if (user) {
-      console.log(user);
-    }
   }, []);
 
   useLayoutEffect(() => {

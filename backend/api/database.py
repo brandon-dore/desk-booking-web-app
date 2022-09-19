@@ -6,7 +6,7 @@ from api import models, security
 from datetime import datetime
 
 
-def add_data_to_db(db):
+def add_data_to_db(db): # pragma: no cover
     db.add(models.User(
         email="admin@admin.com", username="admin", hashed_password=security.get_hashed_password("password"), admin=True))
     db.add(models.User(
@@ -36,7 +36,6 @@ SQLALCHEMY_DATABASE_URL = "postgresql://postgres:password@localhost:5432/desk_bo
 
 engine = create_engine(
     SQLALCHEMY_DATABASE_URL,
-    echo=True
 )
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)

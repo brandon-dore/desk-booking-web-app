@@ -105,7 +105,6 @@ def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
 
 @app.get("/users", response_model=list[schemas.User])
 def read_users(response: Response, range: Union[list[int], None] = Query(default=None), sort: Union[list[str], None] = Query(default=['id', 'ASC']), db: Session = Depends(get_db)):
-    print(range)
     users = crud.get_users(db, range=range, sort=sort)
     response.headers["Content-Range"] = str(len(users))
     response.headers['Access-Control-Expose-Headers'] = 'Content-Range'
@@ -122,7 +121,6 @@ def read_user(user_id: int, db: Session = Depends(get_db)):
 
 @app.get("/users/me/", response_model=schemas.User)
 def read_own_details(current_user: schemas.User = Depends(auth.get_current_active_user)):
-    print(current_user)
     return current_user
 
 
@@ -267,7 +265,7 @@ def read_bookings(booking_id: int, response: Response, db: Session = Depends(get
     db_booking = crud.get_booking(
         db, booking_id=booking_id)
     if db_booking is None:
-        raise HTTPException(status_code=404, detail="Desk not found")
+        raise HTTPException(status_code=404, detail="Booking not found")
     return db_booking
 
 

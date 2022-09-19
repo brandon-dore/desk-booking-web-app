@@ -67,7 +67,7 @@ def get_rooms(db: Session, range: Union[list[int], None], sort: Union[list[str],
         rooms_id = getattr(models.Room, 'id').asc()
     else:
         rooms_id = getattr(models.Room, sort[0]).asc() if sort[1].upper(
-            ) == "ASC" else getattr(models.Room, sort[0]).desc()
+        ) == "ASC" else getattr(models.Room, sort[0]).desc()
     if range == None:
         return db.query(models.Room).order_by(rooms_id).all()
     else:
@@ -106,7 +106,7 @@ def get_desk_by_room_and_number(db: Session, desk_number: int, room_id: int):
 
 def get_desks(db: Session, range: Union[list[int], None], sort: Union[list[str], None]):
     if sort == None:
-           desks_order = getattr(models.Desk, 'id').asc()
+        desks_order = getattr(models.Desk, 'id').asc()
     else:
         desks_order = getattr(models.Desk, sort[0]).asc() if sort[1].upper(
         ) == "ASC" else getattr(models.Desk, sort[0]).desc()
@@ -118,7 +118,7 @@ def get_desks(db: Session, range: Union[list[int], None], sort: Union[list[str],
 
 def get_desks_in_room(db: Session, room_id: int, range: Union[list[int], None], sort: Union[list[str], None]):
     if sort == None:
-           desks_order = getattr(models.Desk, 'id').asc()
+        desks_order = getattr(models.Desk, 'id').asc()
     else:
         desks_order = getattr(models.Desk, sort[0]).asc() if sort[1].upper(
         ) == "ASC" else getattr(models.Desk, sort[0]).desc()
@@ -126,10 +126,6 @@ def get_desks_in_room(db: Session, room_id: int, range: Union[list[int], None], 
         return db.query(models.Desk).filter(models.Desk.room_id == room_id).order_by(desks_order).all()
     else:
         return db.query(models.Desk).filter(models.Desk.room_id == room_id).order_by(desks_order).offset(range[0]).limit(range[1]).all()
-
-    
-    
-
 
 
 def create_desk(db: Session, desk: schemas.DeskCreate):
@@ -180,8 +176,6 @@ def get_bookings(db: Session, range: Union[list[int], None], sort: Union[list[st
 
 def get_bookings_by_room(db: Session, room_id: int, date: datetime.date):
     try:
-        print(str(db.query(models.Booking).join(models.Desk).filter(and_(
-            models.Desk.room_id == room_id, models.Booking.date == date.isoformat())).all()))
         return db.query(models.Booking).join(models.Desk).filter(and_(models.Desk.room_id == room_id, models.Booking.date == date.isoformat())).all()
     except NoResultFound:
         return None
@@ -208,6 +202,7 @@ def update_booking(db: Session, booking: models.Booking, updates: schemas.Bookin
 def delete_booking(db: Session, booking_id: int):
     db.query(models.Booking).filter(models.Booking.id == booking_id).delete()
     db.commit()
+
 
 def get_users_bookings(db: Session, user_id: int):
     return db.query(models.Booking).filter(models.Booking.user_id == user_id).all()

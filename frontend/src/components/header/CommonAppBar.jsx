@@ -49,7 +49,6 @@ export default function CommonAppBar(props) {
   useEffect(() => {
     APIService.getUserInfo().then(
       (response) => {
-        console.log(response);
         setCurrentUser({
           isLoggedIn: true,
           admin: response.data.admin,
