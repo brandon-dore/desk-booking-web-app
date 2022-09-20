@@ -1,12 +1,15 @@
+import os
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy_utils import database_exists, create_database
-from api import models, security
+from app import models, security
 from datetime import datetime
 
+# Basic script to add test data to database
 
-def add_data_to_db(db): # pragma: no cover
+
+def add_data_to_db(db):  # pragma: no cover
     db.add(models.User(
         email="admin@admin.com", username="admin", hashed_password=security.get_hashed_password("password"), admin=True))
     db.add(models.User(
@@ -31,8 +34,11 @@ def add_data_to_db(db): # pragma: no cover
 
     db.commit()
 
+# Inital database setup
 
-SQLALCHEMY_DATABASE_URL = "postgresql://postgres:password@localhost:5432/desk_booking_db"
+
+SQLALCHEMY_DATABASE_URL = os.environ.get(
+    'SQLALCHEMY_DATABASE_URL', 'postgresql://postgres:password@localhost:5432/desk_booking_db_testing')
 
 engine = create_engine(
     SQLALCHEMY_DATABASE_URL,
@@ -41,11 +47,13 @@ engine = create_engine(
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 db = SessionLocal()
+# Create the database and add data if it doesn't exist
 if not database_exists(SQLALCHEMY_DATABASE_URL):
     create_database(SQLALCHEMY_DATABASE_URL)
     models.Base.metadata.create_all(bind=engine)
     add_data_to_db(db)
 else:
+    # Always attempt to create tables in case database exists with no tables
     models.Base.metadata.create_all(bind=engine)
 
 

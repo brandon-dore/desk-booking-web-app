@@ -8,7 +8,7 @@ class APIService {
     return axios.get(API_URL + 'users/me/', { headers: authHeader() });
   }
   getUserBookings() {
-    return axios.get(API_URL + 'users/me/bookings', { headers: authHeader() });
+    return axios.get(API_URL + 'users/me/bookings/', { headers: authHeader() });
   }
   getRooms() {
     return axios.get(API_URL + 'rooms', { headers: authHeader() });

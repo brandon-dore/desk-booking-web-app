@@ -1,16 +1,15 @@
 import datetime
+import os
 import pytest
 import sqlalchemy as sa
 from fastapi.testclient import TestClient
 from sqlalchemy.orm import Session, sessionmaker
 from sqlalchemy import create_engine
-from api.models import Base
-from api.api import app, get_db
+from app.models import Base
+from app.main import app, get_db
 from sqlalchemy_utils import create_database, drop_database, database_exists
 
-SQLALCHEMY_DATABASE_URL = (
-    "postgresql://postgres:password@localhost:5432/desk_booking_db_testing"
-)
+SQLALCHEMY_DATABASE_URL = os.environ.get('SQLALCHEMY_DATABASE_URL', 'postgresql://postgres:password@localhost:5432/desk_booking_db_testing')
 
 engine = create_engine(SQLALCHEMY_DATABASE_URL)
 

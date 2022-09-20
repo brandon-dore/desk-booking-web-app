@@ -3,6 +3,9 @@ from typing import List, Tuple, Union
 import datetime
 from pydantic import BaseModel
 
+# Used for pydantic to define custom types
+# The majority are mapped to database tables
+
 
 class UserBase(BaseModel):
     username: str
@@ -66,6 +69,7 @@ class Desk(DeskBase):
 
     class Config:
         orm_mode = True
+
 
 class DeskUpdate(BaseModel):
     number: Union[int, None] = None

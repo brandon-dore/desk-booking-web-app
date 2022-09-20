@@ -1,3 +1,6 @@
+# Desk-Booking-Web-App
+A buisness application for booking desks in a generic office. (University coursework)
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).

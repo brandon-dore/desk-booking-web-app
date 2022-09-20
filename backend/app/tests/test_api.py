@@ -1,14 +1,3 @@
-import datetime
-import pytest
-import sqlalchemy as sa
-from fastapi.testclient import TestClient
-from sqlalchemy.orm import sessionmaker
-from sqlalchemy import create_engine
-import sqlalchemy
-from api.models import Base
-from api.api import app, get_db
-
-
 class TestPostAndGetEndpoints:
     def test_create_and_get_user(self, client, request_data, response_data):
         response = client.post(
@@ -247,18 +236,18 @@ class TestPatchEndpoints:
     def test_patch_booking(self, client, request_data, response_data):
         response = client.get(f"/bookings/{1}")
         assert response.status_code == 200, response.text
-        
+
         response = client.patch(
             f"/bookings/{1}",
             json=request_data["booking_request_edited"],
         )
         assert response.status_code == 200, response.text
-        
+
         response = client.get(f"/bookings/{1}")
         assert response.status_code == 200, response.text
         data = response.json()
         assert data == response_data["booking_patched_response"]
-        
+
     def test_patch_user_with_error(self, client, request_data):
         response = client.patch(
             f"/users/{100}",
@@ -280,7 +269,6 @@ class TestPatchEndpoints:
         )
         assert response.status_code == 404, response.text
 
-
     def test_patch_booking_with_error(self, client, request_data):
         response = client.patch(
             f"/bookings/{100}",
@@ -289,7 +277,7 @@ class TestPatchEndpoints:
         assert response.status_code == 404, response.text
 
 
-class TestUserAuth:        
+class TestUserAuth:
     def test_register_and_login(self, client, headers, request_data):
         response = client.post(
             "/register",
@@ -310,20 +298,5 @@ class TestUserAuth:
         response = client.post(
             "/login", data=request_data["user_request_invalid"], headers=headers
         )
-    
+
         assert response.status_code == 401, response.text
-
-    def test_get_logged_in_details(self, client, headers, request_data, response_data):
-        response = client.post(
-            "/login", data=request_data["user_request"], headers=headers
-        )
-
-        data = response.json()
-        print({"Authorization": f"Bearer {data['access_token']}"})
-        response = client.get(
-            "/users/me/", headers={"Authorization": f"Bearer {data['access_token']}"}
-        )
-        data = response.json()
-        print(data)
-        assert data == response_data["logged_in_user_response"]
-        assert response.status_code == 200, response.text
