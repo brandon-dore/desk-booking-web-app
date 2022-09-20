@@ -63,7 +63,9 @@ const DeskBooking = () => {
         setUser(response.data);
       },
       (error) => {
-        console.log(error);
+        enqueueSnackbar("Unable to retrive user info", {
+          variant: "error",
+        });
       }
     );
     APIService.getRooms().then(
@@ -71,7 +73,9 @@ const DeskBooking = () => {
         setRooms(response.data);
       },
       (error) => {
-        console.log(error);
+        enqueueSnackbar("Unable to retrive rooms", {
+          variant: "error",
+        });
       }
     );
   }, []);
@@ -259,7 +263,7 @@ const DeskBooking = () => {
                             },
                         border: 2,
                         borderBottomStyle: "solid",
-                        backgroundColor: desk.booked ? "rgba(255, 0, 0, 0.75)" : "white",
+                        backgroundColor: desk.booked ? "rgba(128,128,128, 0.75)" : "white",
                         textAlign: "center",
                         display: "flex",
                         flexDirection: "column",

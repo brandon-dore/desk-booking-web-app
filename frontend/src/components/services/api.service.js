@@ -7,14 +7,17 @@ class APIService {
   getUserInfo() {
     return axios.get(API_URL + 'users/me/', { headers: authHeader() });
   }
+  getUserBookings() {
+    return axios.get(API_URL + 'users/me/bookings/', { headers: authHeader() });
+  }
   getRooms() {
     return axios.get(API_URL + 'rooms', { headers: authHeader() });
   }
   getDesks(roomId) {
-    return axios.get(API_URL + 'desks/' + roomId + "?range=[0,25]", { headers: authHeader() });
+    return axios.get(API_URL + 'rooms/' + roomId + '/desks' +  '?range=[0,25]', { headers: authHeader() });
   }
   getBookings(date, roomId) {
-    return axios.get(API_URL + 'bookings/' + date + "/" + roomId, { headers: authHeader() });
+    return axios.get(API_URL + 'rooms/' + roomId + "/bookings/" + date, { headers: authHeader() });
   }
   getUser(userId) {
     return axios.get(API_URL + 'users/' + userId, { headers: authHeader() });

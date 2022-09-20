@@ -1,13 +1,13 @@
 from fastapi import Depends, HTTPException, status
-from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
 from jose import JWTError, jwt
-from passlib.context import CryptContext
-from api.database import SessionLocal
+from app.database import SessionLocal
 
-from api import schemas, crud, security
+from app import schemas, crud, security
 
 import datetime
+
+# Dependency is remade since an import would create circular dependencies
 
 
 def get_db():
@@ -17,13 +17,16 @@ def get_db():
     finally:
         db.close()
 
+# JSON Web Token (JWT) Functions
+
 
 def generic_token_creation(data: dict, expires_delta: datetime.timedelta, token_type: str):
     to_encode = data.copy()
     expire = datetime.datetime.utcnow() + expires_delta
     to_encode.update({"exp": expire})
     if token_type == "access":
-        encoded_jwt = jwt.encode(to_encode, security.SECRET_KEY, algorithm=security.ALGORITHM)
+        encoded_jwt = jwt.encode(
+            to_encode, security.SECRET_KEY, algorithm=security.ALGORITHM)
     else:
         encoded_jwt = jwt.encode(
             to_encode, security.JWT_REFRESH_SECRET_KEY, algorithm=security.ALGORITHM)
@@ -38,6 +41,7 @@ def authenticate_user(db: Session, username: str, password: str):
         return False
     return user
 
+
 def get_current_user(db: Session = Depends(get_db), token: str = Depends(security.reuseable_oauth)):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
@@ -45,7 +49,8 @@ def get_current_user(db: Session = Depends(get_db), token: str = Depends(securit
         headers={"WWW-Authenticate": "Bearer"},
     )
     try:
-        payload = jwt.decode(token, security.SECRET_KEY, algorithms=[security.ALGORITHM])
+        payload = jwt.decode(token, security.SECRET_KEY,
+                             algorithms=[security.ALGORITHM])
         username: str = payload.get("sub")
         if username is None:
             raise credentials_exception
@@ -56,6 +61,7 @@ def get_current_user(db: Session = Depends(get_db), token: str = Depends(securit
     if user is None:
         raise credentials_exception
     return user
+
 
 def get_current_active_user(current_user: schemas.User = Depends(get_current_user)):
     return current_user

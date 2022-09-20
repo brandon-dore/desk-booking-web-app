@@ -10,7 +10,6 @@ const Home = () => {
   useEffect(() => {
     APIService.getUserInfo().then(
       (response) => {
-        console.log(response)
         setCurrentUser({ username: response.data.username });
       },
       (error) => {

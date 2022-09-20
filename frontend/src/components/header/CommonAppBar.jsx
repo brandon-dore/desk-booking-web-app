@@ -49,7 +49,6 @@ export default function CommonAppBar(props) {
   useEffect(() => {
     APIService.getUserInfo().then(
       (response) => {
-        console.log(response);
         setCurrentUser({
           isLoggedIn: true,
           admin: response.data.admin,
@@ -140,6 +139,14 @@ export default function CommonAppBar(props) {
               sx={{ my: 2, color: "white", display: "block" }}
             >
               Book a Desk
+            </Button>
+          )}
+          {currentUser.isLoggedIn && (
+            <Button
+              onClick={() => navigate("/my-bookings")}
+              sx={{ my: 2, color: "white", display: "block" }}
+            >
+              My Bookings
             </Button>
           )}
           {currentUser.admin && (
