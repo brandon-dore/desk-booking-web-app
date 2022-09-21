@@ -1,7 +1,12 @@
 # Desk Booking Web Application
 
-> This desk booking web application provides a full stack soloution to booking desks. This is especially needed in the current world climate where most offices use a hot-desk system. This provides the soloution with features such as user accounts, interactive desk booking/viewing and administration to view the database straight from the frontend UI.
+> This desk booking web application provides a full stack solution to booking desks. This is especially needed in the current world climate where most offices use a hot-desk system. This provides the soloution with features such as user accounts, interactive desk booking/viewing and administration to view the database straight from the frontend UI.
+> 
+## App Screenshots
 
+|                                                                                    Desk Booking App Homepage|                                                                                   Desk Booking Page |                                                                                My Bookings Page                                                                                |                                                                             Admin Control Panel                                                                              |
+| :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: |
+| <img src="https://raw.githubusercontent.com/Brandon-D-2020/Desk-Booking-Web-App/master/.github/home-page.png" title="Desk Booking App Homepage" width="100%" crossorigin> | <img src="https://raw.githubusercontent.com/Brandon-D-2020/Desk-Booking-Web-App/master/.github/desk-booking-page.png" title="Desk Booking Page" width="100%" crossorigin> | <img src="https://raw.githubusercontent.com/Brandon-D-2020/Desk-Booking-Web-App/master/.github/my-bookings-page.png" title="My Bookings Page" width="100%" crossorigin> | <img src="https://raw.githubusercontent.com/Brandon-D-2020/Desk-Booking-Web-App/master/.github/admin-page.png" title="Admin Control Panel" width="100%" crossorigin> |
 
 # Folder Structure
 ```
@@ -59,7 +64,7 @@
 
 
 ## Run locally
-Run these in order for local setup
+Run these in order for local setup, this is assuming you have VSCode installed and have opened the soloution.
 #### PostgreSQL
 
  - Download and install [PostgreSQL](https://www.postgresql.org/download/)
@@ -84,6 +89,9 @@ Run all the command in the venv you set up previously
  - `pytest -vv`
  - `coverage run -m pytest `
  - `coverage report`
-
-
- 
+## Accessing the UI and API
+After running the application you can access the various components through these URLs.
+*Note: Swagger docs are recommended*
+ - UI: http://localhost:3000/
+ - API Swagger Docs: http://localhost:8000/docs#/
+ - API Redoc Docs: http://localhost:8000/redoc
