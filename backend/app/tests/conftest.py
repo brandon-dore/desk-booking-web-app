@@ -8,12 +8,15 @@ from app.models import Base
 from app.main import app, get_db
 from sqlalchemy_utils import create_database, drop_database, database_exists
 
-SQLALCHEMY_DATABASE_URL = os.environ.get('SQLALCHEMY_DATABASE_URL', 'postgresql://postgres:password@localhost:5432/desk_booking_db_testing')
+SQLALCHEMY_DATABASE_URL = os.environ.get(
+    'SQLALCHEMY_DATABASE_URL', 'postgresql://postgres:password@localhost:5432/desk_booking_db_testing')
 
-engine = create_engine(SQLALCHEMY_DATABASE_URL)
+engine = create_engine(SQLALCHEMY_DATABASE_URL,
+                       pool_pre_ping=True
+                       )
 
 
-def get_test_db():
+def get_test_db(): # pragma: no cover
     """
     Mock override for get_db() dependancy
     """
@@ -27,21 +30,22 @@ def get_test_db():
 
 
 @pytest.fixture(scope="session", autouse=True)
-def create_test_database():
+def create_test_database(): # pragma: no cover
     """
     Create a new database for each test file
     """
     if database_exists(SQLALCHEMY_DATABASE_URL):
         drop_database(SQLALCHEMY_DATABASE_URL)
-    create_database(SQLALCHEMY_DATABASE_URL) 
+    create_database(SQLALCHEMY_DATABASE_URL)
     Base.metadata.create_all(engine)
-    
+
     app.dependency_overrides[get_db] = get_test_db
     yield
-    drop_database(SQLALCHEMY_DATABASE_URL) 
+    drop_database(SQLALCHEMY_DATABASE_URL)
+
 
 @pytest.fixture(scope="class", autouse=True)
-def test_db():
+def test_db(): # pragma: no cover
     """
     Recreate tables (remove data) after every test class
     """
@@ -49,8 +53,9 @@ def test_db():
     yield
     Base.metadata.drop_all(bind=engine)
 
+
 @pytest.fixture(scope="module")
-def client():
+def client(): # pragma: no cover
     """
     Creates a mock client for fast api
     """
@@ -59,7 +64,7 @@ def client():
 
 
 @pytest.fixture()
-def request_data():
+def request_data(): # pragma: no cover
     """
     Provide reusable data to send request
     """
@@ -135,7 +140,7 @@ def request_data():
 
 
 @pytest.fixture()
-def response_data():
+def response_data(): # pragma: no cover
     """
     Provide reusable data to assert against responses
     """
@@ -172,5 +177,5 @@ def response_data():
 
 
 @pytest.fixture()
-def headers():
+def headers(): # pragma: no cover
     return {"Content-Type": "application/x-www-form-urlencoded"}

@@ -9,7 +9,7 @@ from datetime import datetime
 # Basic script to add test data to database
 
 
-def add_data_to_db(db):  # pragma: no cover
+def add_data_to_db(db): # pragma: no cover
     db.add(models.User(
         email="admin@admin.com", username="admin", hashed_password=security.get_hashed_password("password"), admin=True))
     db.add(models.User(

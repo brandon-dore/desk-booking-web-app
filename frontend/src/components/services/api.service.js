@@ -24,7 +24,6 @@ class APIService {
     return axios.get(API_URL + 'users/' + userId, { headers: authHeader() });
   }
   makeBooking(data) {
-    console.log(data)
     return axios.post(API_URL + "bookings", data, { headers: authHeader() });
   }
 }

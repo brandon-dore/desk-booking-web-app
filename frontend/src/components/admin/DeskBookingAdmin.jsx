@@ -53,7 +53,6 @@ export const DeskBookingAdmin = () => {
   useEffect(() => {
     APIService.getUserInfo().then(
       (response) => {
-        console.log(response)
         setIsAdmin(response.data.admin);
       },
       (error) => {
