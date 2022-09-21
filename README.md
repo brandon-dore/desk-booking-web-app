@@ -100,9 +100,7 @@ Run all the command in the venv you set up previously
  
 The most up-to-date tests and code coverage can be seen below:
 <div align="center">
-    <a href="https://github.com/Brandon-D-2020/Desk-Booking-Web-App">
-        <img src="https://raw.githubusercontent.com/Brandon-D-2020/Desk-Booking-Web-App/master/.github/tests.png" crossorigin>
-    </a>
+    <img src="https://raw.githubusercontent.com/Brandon-D-2020/Desk-Booking-Web-App/master/.github/tests.png" crossorigin>
 </div>
 
 ## Accessing the UI and API
