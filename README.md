@@ -8,7 +8,7 @@
 > This desk booking web application provides a full stack solution to booking desks. This is especially needed in the current world climate where most offices use a hot-desk system. This provides the soloution with features such as user accounts, interactive desk booking/viewing and administration to view the database straight from the frontend UI.
 > 
 ## App Screenshots
-These screenshots exclude much of the application such as booking desk modals, my account modal, logging in/out and registering and account.
+These screenshots exclude much of the application such as; alerts for errors and booking desks, logging in/out and registering, booking desk modals and account information modals.
 **Note: Please refer to assignment submission to see videos of full function or run the application locally (recommended to use docker)*
 
 |                                                                                    Desk Booking App Homepage|                                                                                   Desk Booking Page |                                                                                My Bookings Page                                                                                |                                                                             Admin Control Panel                                                                              |
@@ -57,6 +57,7 @@ These screenshots exclude much of the application such as booking desk modals, m
  - [FastAPI](https://fastapi.tiangolo.com/)
  - [React](https://reactjs.org/)
  - [PosgreSQL](https://www.postgresql.org/)
+ - [JWT's](https://jwt.io/)
 
 ## Prerequisites
 #### Clone the project
@@ -90,12 +91,14 @@ Run these in order for local setup, this is assuming you have VSCode installed a
  - `cd ./frontend/`
  - `npm install`
  - Start the development server using `npm start`
-#### Testing and Code Coverage
+## Testing and Code Coverage
 Run all the command in the venv you set up previously
  - `cd ./backend/` 
  - `pytest -vv`
  - `coverage run -m pytest `
  - `coverage report`
+The most up-to-date tests and code coverage can be seen below
+<img src="https://raw.githubusercontent.com/Brandon-D-2020/Desk-Booking-Web-App/master/.github/tests.png" crossorigin>
 ## Accessing the UI and API
 After running the application you can access the various components through these URLs.
 *Note: Swagger docs are recommended*
