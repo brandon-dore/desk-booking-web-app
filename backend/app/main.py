@@ -86,6 +86,17 @@ def docs():
 
 @app.post("/login", response_model=schemas.Token)
 def login_and_get_token(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
+    '''
+    Checks if a user exists using the authenticate user function. If they don't they are unautherised.
+    If they do exist a JWT is generated using authentication functions and returned.
+
+    Parameters:
+            db (Session): A session of a database (from dependancy)
+            form_data (OAuth2PasswordRequestForm): Contains data for registering a user
+
+    Returns:
+        JWT (dictionary): A dictionary containing the JWTs access and refresh token as well as the token type
+    '''
     user = auth.authenticate_user(db, form_data.username, form_data.password)
     if not user:
         raise HTTPException(

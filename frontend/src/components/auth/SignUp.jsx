@@ -22,6 +22,7 @@ export const SignUp = () => {
 
   const navigate = useNavigate();
 
+  // Validation for form
   const validationSchema = Yup.object().shape({
     username: Yup.string()
       .required("Username is required")

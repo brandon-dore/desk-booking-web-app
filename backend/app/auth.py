@@ -21,6 +21,9 @@ def get_db():
 
 
 def generic_token_creation(data: dict, expires_delta: datetime.timedelta, token_type: str):
+    """
+    Creates a JWT
+    """
     to_encode = data.copy()
     expire = datetime.datetime.utcnow() + expires_delta
     to_encode.update({"exp": expire})
@@ -34,6 +37,9 @@ def generic_token_creation(data: dict, expires_delta: datetime.timedelta, token_
 
 
 def authenticate_user(db: Session, username: str, password: str):
+    """
+    Checks if a user exists with credentials provided
+    """
     user = crud.get_user_by_username(db, username=username)
     if not user:
         return False
@@ -43,6 +49,9 @@ def authenticate_user(db: Session, username: str, password: str):
 
 
 def get_current_user(db: Session = Depends(get_db), token: str = Depends(security.reuseable_oauth)):
+    """
+    Gets the current logged in user entity based on the JWT (token) passed in
+    """
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",

@@ -132,6 +132,7 @@ const DeskBooking = () => {
           updateDesks(desk.id, "booked_user", undefined);
         });
         if (bookingsResponse.length > 0) {
+          // Add bookings to each desk that has one
           desks.forEach((desk) => {
             bookingsResponse.forEach((booking) => {
               if (desk.id == booking.desk_id) {
@@ -245,9 +246,11 @@ const DeskBooking = () => {
               {[...Array(32)].map((_, index) => {
                 let seperate = [8, 9, 10, 11, 20, 21, 22, 23];
                 let desk;
+                // Adds a seperation between every block of desks
                 if (seperate.includes(index) && desks.length > currentDesk) {
                   return <Box></Box>;
                 } else if (desks.length > currentDesk + 1) {
+                  // Go to next desk
                   currentDesk++;
                   desk = desks[currentDesk];
                   return (

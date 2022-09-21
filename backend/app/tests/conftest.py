@@ -1,9 +1,8 @@
 import datetime
 import os
 import pytest
-import sqlalchemy as sa
 from fastapi.testclient import TestClient
-from sqlalchemy.orm import Session, sessionmaker
+from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
 from app.models import Base
 from app.main import app, get_db
@@ -15,6 +14,9 @@ engine = create_engine(SQLALCHEMY_DATABASE_URL)
 
 
 def get_test_db():
+    """
+    Mock override for get_db() dependancy
+    """
     SessionLocal = sessionmaker(bind=engine)
     test_db = SessionLocal()
 
@@ -27,33 +29,40 @@ def get_test_db():
 @pytest.fixture(scope="session", autouse=True)
 def create_test_database():
     """
-    Create a clean database on every test case.
-    We use the `sqlalchemy_utils` package here for a few helpers in consistently
-    creating and dropping the database.
+    Create a new database for each test file
     """
     if database_exists(SQLALCHEMY_DATABASE_URL):
         drop_database(SQLALCHEMY_DATABASE_URL)
-    create_database(SQLALCHEMY_DATABASE_URL)  # Create the test database.
-    Base.metadata.create_all(engine)  # Create the tables.
-    # Mock the Database Dependency
+    create_database(SQLALCHEMY_DATABASE_URL) 
+    Base.metadata.create_all(engine)
+    
     app.dependency_overrides[get_db] = get_test_db
-    yield  # Run the tests.
-    drop_database(SQLALCHEMY_DATABASE_URL)  # Drop the test database.
+    yield
+    drop_database(SQLALCHEMY_DATABASE_URL) 
 
 @pytest.fixture(scope="class", autouse=True)
 def test_db():
+    """
+    Recreate tables (remove data) after every test class
+    """
     Base.metadata.create_all(bind=engine)
     yield
     Base.metadata.drop_all(bind=engine)
 
 @pytest.fixture(scope="module")
 def client():
+    """
+    Creates a mock client for fast api
+    """
     with TestClient(app) as c:
         yield c
 
 
 @pytest.fixture()
 def request_data():
+    """
+    Provide reusable data to send request
+    """
     return {
         "user_request": {
             "username": "user5482",
@@ -127,6 +136,9 @@ def request_data():
 
 @pytest.fixture()
 def response_data():
+    """
+    Provide reusable data to assert against responses
+    """
     return {
         "user_response": {
             "username": "user5482",

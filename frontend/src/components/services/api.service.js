@@ -3,6 +3,7 @@ import authHeader from './auth-header';
 
 const API_URL = 'http://localhost:8000/';
 
+// Reusable methods to call the API, excluding auth
 class APIService {
   getUserInfo() {
     return axios.get(API_URL + 'users/me/', { headers: authHeader() });

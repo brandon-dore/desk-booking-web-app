@@ -16,7 +16,7 @@ reuseable_oauth = OAuth2PasswordBearer(
     scheme_name="JWT"
 )
 
-# Password hashign functions so if the database is comprimised, passwords cannot be easily retrived
+# Password hashing functions so if the database is comprimised, passwords cannot be easily retrived
 
 
 def get_hashed_password(password: str):

@@ -3,6 +3,8 @@ import * as qs from "qs";
 import jwt_decode from "jwt-decode";
 
 const API_URL = "http://localhost:8000/";
+
+// Reusable methods to authenticate user
 class AuthService {
   login(data) {
     console.log(data)
