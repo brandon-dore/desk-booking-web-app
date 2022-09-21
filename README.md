@@ -15,6 +15,11 @@ These screenshots exclude much of the application such as; alerts for errors and
 | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: |
 | <img src="https://raw.githubusercontent.com/Brandon-D-2020/Desk-Booking-Web-App/master/.github/home-page.png" title="Desk Booking App Homepage" width="100%" crossorigin> | <img src="https://raw.githubusercontent.com/Brandon-D-2020/Desk-Booking-Web-App/master/.github/desk-booking-page.png" title="Desk Booking Page" width="100%" crossorigin> | <img src="https://raw.githubusercontent.com/Brandon-D-2020/Desk-Booking-Web-App/master/.github/my-bookings-page.png" title="My Bookings Page" width="100%" crossorigin> | <img src="https://raw.githubusercontent.com/Brandon-D-2020/Desk-Booking-Web-App/master/.github/admin-page.png" title="Admin Control Panel" width="100%" crossorigin> |
 
+## Database Structure (E-R Diagram)
+<div align="center">
+    <img src="https://raw.githubusercontent.com/Brandon-D-2020/Desk-Booking-Web-App/master/.github/ER-diagram.png" crossorigin>
+</div>
+
 # Folder Structure
 ```
 └── desk-booking-web-app/
