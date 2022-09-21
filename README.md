@@ -110,4 +110,5 @@ After running the application you can access the various components through thes
  - API Swagger Docs: http://localhost:8000/docs#/
  - API Redoc Docs: http://localhost:8000/redoc
 
- 
+## Dependencies
+Dependencies are described in the directories  `./backend/requirements.txt` and `./frontend/package.json`
