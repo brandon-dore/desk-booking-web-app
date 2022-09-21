@@ -1,4 +1,9 @@
 # Desk Booking Web Application
+<div align="center">
+    <a href="https://github.com/Brandon-D-2020/Desk-Booking-Web-App">
+        <img src="https://raw.githubusercontent.com/Brandon-D-2020/Desk-Booking-Web-App/master/.github/logo.png" crossorigin>
+    </a>
+</div>
 
 > This desk booking web application provides a full stack solution to booking desks. This is especially needed in the current world climate where most offices use a hot-desk system. This provides the soloution with features such as user accounts, interactive desk booking/viewing and administration to view the database straight from the frontend UI.
 > 
@@ -97,3 +102,5 @@ After running the application you can access the various components through thes
  - UI: http://localhost:3000/
  - API Swagger Docs: http://localhost:8000/docs#/
  - API Redoc Docs: http://localhost:8000/redoc
+
+ 
