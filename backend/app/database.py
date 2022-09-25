@@ -38,7 +38,7 @@ def add_data_to_db(db): # pragma: no cover
 
 
 SQLALCHEMY_DATABASE_URL = os.environ.get(
-    'SQLALCHEMY_DATABASE_URL', 'postgresql://postgres:password@localhost:5432/desk_booking_db_testing')
+    'SQLALCHEMY_DATABASE_URL', 'postgresql://postgres:password@localhost:5432/desk_booking_db')
 
 engine = create_engine(
     SQLALCHEMY_DATABASE_URL,
